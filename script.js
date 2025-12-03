@@ -1,6 +1,6 @@
 // Конфигурация магазина
 const SHOP_CONFIG = {
-    name: "SHOP IGLOVA",
+    name: "IGLOV SHOP",
     owner: {
         telegram: "https://t.me/useriglov",
         username: "@useriglov"
@@ -19,7 +19,7 @@ const TYPING_TEXTS = [
     "initializing shop database...",
     "connecting to product storage...",
     "loading available items...",
-    "welcome to shop iglova",
+    "welcome to iglov shop",
     "type 'help' for commands",
     "establishing secure connection...",
     "encryption protocols active...",
@@ -522,7 +522,7 @@ function getOrderMessage(product) {
     const itemName = product.number || product.name || 'товар';
     const price = product.price || 'цена не указана';
     
-    return `Здравствуйте! Хочу купить товар из SHOP IGLOVA:\n\n` +
+    return `Здравствуйте! Хочу купить товар из IGLOV SHOP:\n\n` +
            `🔹 Товар: ${itemName}\n` +
            `🔹 Цена: ${price}\n` +
            `🔹 Категория: ${product.categoryName}\n\n` +
