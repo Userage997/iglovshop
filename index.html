@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Сканирующая линия (киберпанк эффект) -->
+    <div class="scan-line"></div>
+    
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div class="terminal-container">
         <!-- Экран 1: Главный -->
@@ -19,7 +22,7 @@
                 <div class="prompt">root@iglova:~$</div>
                 <div class="status">
                     <span class="status-indicator active"></span>
-                    <span>ОПЕРАЦИОННАЯ СИСТЕМА АКТИВНА</span>
+                    <span class="status-text">СИСТЕМА АКТИВНА</span>
                 </div>
             </div>
             
@@ -30,16 +33,16 @@
                 
                 <div class="ascii-art">
                     <pre class="ascii-large">
-███████╗██╗  ██╗ ██████╗ ██████╗      ██╗ ██████╗ ██╗      ██████╗ ██╗   ██╗ █████╗ 
-██╔════╝██║  ██║██╔═══██╗██╔══██╗     ██║██╔═══██╗██║     ██╔═══██╗██║   ██║██╔══██╗
-███████╗███████║██║   ██║██████╔╝     ██║██║   ██║██║     ██║   ██║██║   ██║███████║
-╚════██║██╔══██║██║   ██║██╔═══╝██   ██║██║   ██║██║     ██║   ██║██║   ██║██╔══██║
-███████║██║  ██║╚██████╔╝██║    ╚█████╔╝╚██████╔╝███████╗╚██████╔╝╚██████╔╝██║  ██║
-╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚════╝  ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+░██████╗██╗░░██╗░█████╗░██████╗░░░░░░░░░█████╗░██████╗░██╗░░░░░░█████╗░██╗░░░██╗██████╗░░█████╗░
+██╔════╝██║░░██║██╔══██╗██╔══██╗░░░░░░░██╔══██╗██╔══██╗██║░░░░░██╔══██╗██║░░░██║██╔══██╗██╔══██╗
+╚█████╗░███████║███████║██████╔╝█████╗██║░░╚═╝██████╔╝██║░░░░░██║░░██║██║░░░██║██████╔╝██║░░██║
+░╚═══██╗██╔══██║██╔══██║██╔═══╝░╚════╝██║░░██╗██╔══██╗██║░░░░░██║░░██║██║░░░██║██╔══██╗██║░░██║
+██████╔╝██║░░██║██║░░██║██║░░░░░░░░░░░╚█████╔╝██║░░██║███████╗╚█████╔╝╚██████╔╝██║░░██║╚█████╔╝
+╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░░░░░░░░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░░╚═════╝░╚═╝░░╚═╝░╚════╝░
                     </pre>
                 </div>
                 
-                <div class="shop-description">
+                <div class="shop-description cyber-border">
                     <div class="info-line">
                         <span class="info-prefix">>_</span>
                         <span class="info-text">Продажа виртуальных и физических номеров</span>
@@ -52,16 +55,20 @@
                         <span class="info-prefix">>_</span>
                         <span class="info-text">Гарантия качества • Быстрая доставка</span>
                     </div>
+                    <div class="info-line">
+                        <span class="info-prefix">$</span>
+                        <span class="info-text">Владелец: <a href="https://t.me/useriglov" target="_blank" class="cyber-link">@useriglov</a></span>
+                    </div>
                 </div>
                 
                 <div class="menu-grid">
-                    <button class="cyber-btn" data-target="screen-2">
+                    <button class="cyber-btn terminal-flicker" data-target="screen-2">
                         <span class="btn-number">[1]</span>
                         <span class="btn-text">ПРОСМОТР ТОВАРОВ</span>
                         <span class="btn-cursor">_</span>
                     </button>
                     
-                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn link-btn">
+                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn link-btn terminal-flicker">
                         <span class="btn-number">[2]</span>
                         <span class="btn-text">СВЯЗЬ С ВЛАДЕЛЬЦЕМ</span>
                         <span class="btn-external"><i class="fab fa-telegram"></i></span>
@@ -69,7 +76,7 @@
                 </div>
                 
                 <div class="terminal-footer">
-                    <div class="command-line">
+                    <div class="command-line cyber-border">
                         <span class="prompt">customer@shop:~$</span>
                         <span class="typing-text" id="typing-text"></span>
                         <span class="cursor">█</span>
@@ -90,46 +97,60 @@
                     <i class="fas fa-arrow-left"></i> НАЗАД
                 </button>
                 <div class="prompt">root@iglova:~/products$</div>
-                <div class="last-update" id="last-update">Обновлено: загрузка...</div>
+                <div class="last-update" id="last-update">Загрузка времени...</div>
             </div>
             
             <div class="content">
                 <h2 class="screen-title">
-                    <span class="command-prefix">></span> КАТАЛОГ ТОВАРОВ
+                    <span class="command-prefix">>>></span> КАТАЛОГ ТОВАРОВ
                 </h2>
                 
                 <!-- Фильтры категорий -->
-                <div class="category-filter">
-                    <button class="category-btn active" data-category="all">ВСЕ ТОВАРЫ</button>
-                    <button class="category-btn" data-category="russian">🇷🇺 НОМЕРА РФ</button>
-                    <button class="category-btn" data-category="foreign">🌍 ЗАРУБЕЖНЫЕ</button>
-                    <button class="category-btn" data-category="nft_users">🎨 NFT ЮЗЕРЫ</button>
-                    <button class="category-btn" data-category="nft_gifts">🎁 NFT ПОДАРКИ</button>
+                <div class="category-filter cyber-border">
+                    <button class="category-btn active" data-category="all">[ALL] ВСЕ ТОВАРЫ</button>
+                    <button class="category-btn" data-category="russian">[RU] НОМЕРА РФ</button>
+                    <button class="category-btn" data-category="foreign">[INT] ЗАРУБЕЖНЫЕ</button>
+                    <button class="category-btn" data-category="nft_users">[NFT] NFT ЮЗЕРЫ</button>
+                    <button class="category-btn" data-category="nft_gifts">[GIFT] NFT ПОДАРКИ</button>
+                </div>
+                
+                <!-- Кнопка принудительного обновления -->
+                <div class="update-notice">
+                    <button id="force-refresh" class="cyber-btn small">
+                        <span class="btn-number">[↻]</span>
+                        <span class="btn-text">ОБНОВИТЬ БАЗУ ТОВАРОВ</span>
+                    </button>
+                    <div class="update-status" id="update-status"></div>
                 </div>
                 
                 <!-- Контейнер для товаров -->
                 <div class="products-container" id="products-container">
                     <div class="loading-products">
                         <div class="loading-spinner"></div>
-                        <p>Загрузка товаров...</p>
+                        <p>ИНИЦИАЛИЗАЦИЯ БАЗЫ ТОВАРОВ...</p>
+                        <p class="loading-subtext">Подключение к хранилищу данных...</p>
                     </div>
                 </div>
                 
                 <!-- Инфо -->
-                <div class="shop-info">
+                <div class="shop-info cyber-border">
                     <div class="info-line">
                         <span class="info-prefix">$</span>
-                        <span class="info-text">Для покупки пишите в Telegram: <a href="https://t.me/useriglov" target="_blank">@useriglov</a></span>
+                        <span class="info-text">Для покупки: <a href="https://t.me/useriglov" target="_blank" class="cyber-link">@useriglov</a></span>
                     </div>
                     <div class="info-line">
                         <span class="info-prefix">$</span>
                         <span class="info-text">Цены указаны за единицу товара</span>
                     </div>
+                    <div class="info-line">
+                        <span class="info-prefix">!</span>
+                        <span class="info-text">Тикеты: <a href="https://t.me/fuckiglov" target="_blank" class="cyber-link">@fuckiglov</a> 💷 33 изме</span>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Экран 3: Контакты (резервный) -->
+        <!-- Экран 3: Контакты -->
         <section id="screen-3" class="screen">
             <div class="terminal-header">
                 <button class="back-btn" data-target="screen-1">
@@ -140,34 +161,56 @@
             
             <div class="content">
                 <h2 class="screen-title">
-                    <span class="command-prefix">></span> КОНТАКТЫ И ПОКУПКА
+                    <span class="command-prefix">>>></span> КОНТАКТЫ И ПОКУПКА
                 </h2>
                 
                 <div class="contacts-container">
-                    <div class="contact-method">
+                    <div class="contact-method cyber-border">
                         <div class="method-icon"><i class="fab fa-telegram"></i></div>
                         <div class="method-info">
-                            <h4>Владелец магазина</h4>
-                            <a href="https://t.me/useriglov" target="_blank" class="method-link">@useriglov</a>
+                            <h4>ВЛАДЕЛЕЦ МАГАЗИНА</h4>
+                            <a href="https://t.me/useriglov" target="_blank" class="method-link cyber-link">@useriglov</a>
                             <p class="method-desc">Основной канал связи</p>
                         </div>
                     </div>
                     
-                    <div class="contact-method">
+                    <div class="contact-method cyber-border">
                         <div class="method-icon"><i class="fas fa-shopping-cart"></i></div>
                         <div class="method-info">
-                            <h4>Процесс покупки</h4>
-                            <p class="method-desc">1. Выберите товар<br>2. Напишите в Telegram<br>3. Получите инструкции по оплате<br>4. Получите товар</p>
+                            <h4>ПРОЦЕСС ПОКУПКИ</h4>
+                            <ol class="purchase-steps">
+                                <li>Выберите товар</li>
+                                <li>Напишите в Telegram</li>
+                                <li>Получите инструкции по оплате</li>
+                                <li>Получите товар</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-method cyber-border">
+                        <div class="method-icon"><i class="fas fa-headset"></i></div>
+                        <div class="method-info">
+                            <h4>ТЕХНИЧЕСКАЯ ПОДДЕРЖКА</h4>
+                            <a href="https://t.me/fuckiglov" target="_blank" class="method-link cyber-link">@fuckiglov</a>
+                            <p class="method-desc">Тикеты и вопросы</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="action-buttons center-buttons">
-                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn primary">
+                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn primary terminal-flicker">
                         <span class="btn-number">[!]</span>
-                        <span>НАПИСАТЬ В TELEGRAM</span>
+                        <span>ЭКСТРЕННАЯ СВЯЗЬ В TELEGRAM</span>
                         <span class="btn-external"><i class="fab fa-telegram"></i></span>
                     </a>
+                </div>
+                
+                <div class="warning-notice cyber-border">
+                    <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="warning-text">
+                        <strong>ВНИМАНИЕ:</strong> Все сделки проводятся через Telegram. Не доверяйте поддельным аккаунтам.
+                        Проверяйте username: <span class="cyber-link">@useriglov</span>
+                    </div>
                 </div>
             </div>
         </section>
