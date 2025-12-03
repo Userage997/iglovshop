@@ -32,7 +32,7 @@ body {
         #00ffff 50%, 
         #00ff00 80%, 
         transparent 100%);
-    animation: scan 3s linear infinite;
+    animation: scan 8s linear infinite;
     z-index: 9999;
     pointer-events: none;
     opacity: 0.7;
@@ -169,31 +169,75 @@ body {
     padding: 20px 0;
 }
 
-/* Анимация печатающегося текста */
-.typewriter {
+/* Заголовок магазина */
+.shop-title-container {
+    text-align: center;
+    margin: 30px 0 40px 0;
+    position: relative;
+}
+
+.shop-title-main {
+    font-size: 4.5rem;
+    color: #00ff00;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    text-shadow: 
+        0 0 10px #00ff00,
+        0 0 20px #00ff00,
+        0 0 30px #00ff00,
+        0 0 40px #00ff00;
+    margin-bottom: 10px;
+    animation: titleGlow 2s infinite alternate;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.shop-title-sub {
     font-size: 2.5rem;
-    margin-bottom: 40px;
-    overflow: hidden;
-    border-right: 3px solid #00ff00;
-    white-space: nowrap;
-    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-    text-shadow: 0 0 20px #00ff00;
-}
-
-@keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
-}
-
-@keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: #00ff00; }
-}
-
-.command-prefix {
     color: #00ffff;
-    margin-right: 10px;
-    text-shadow: 0 0 10px #00ffff;
+    font-weight: 500;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+    position: relative;
+    animation: subtitleFloat 3s infinite ease-in-out;
+}
+
+.shop-title-sub::before,
+.shop-title-sub::after {
+    content: '—';
+    color: #ff9900;
+    margin: 0 20px;
+    font-size: 2rem;
+}
+
+@keyframes titleGlow {
+    0% {
+        text-shadow: 
+            0 0 10px #00ff00,
+            0 0 20px #00ff00,
+            0 0 30px #00ff00;
+        transform: scale(1);
+    }
+    100% {
+        text-shadow: 
+            0 0 15px #00ff00,
+            0 0 30px #00ff00,
+            0 0 45px #00ff00,
+            0 0 60px #00ff00;
+        transform: scale(1.02);
+    }
+}
+
+@keyframes subtitleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }
 
 /* ASCII арт */
@@ -222,6 +266,48 @@ body {
                      0 0 30px rgba(0, 255, 255, 0.6);
         transform: scale(1.02);
     }
+}
+
+/* Описание магазина */
+.shop-description {
+    border-radius: 5px;
+    padding: 25px;
+    margin: 30px auto;
+    max-width: 800px;
+}
+
+.info-line {
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
+}
+
+.info-line:last-child {
+    border-bottom: none;
+}
+
+.info-prefix {
+    color: #ff9900;
+    margin-right: 10px;
+    min-width: 30px;
+    text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+}
+
+.info-text {
+    color: #ffffff;
+}
+
+/* Кибер-ссылки */
+.cyber-link {
+    color: #00ffff;
+    text-decoration: none;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.cyber-link:hover {
+    text-decoration: underline;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
 }
 
 /* Сетка меню */
@@ -358,48 +444,6 @@ body {
 .indicator-dot.active {
     background: #00ff00;
     box-shadow: 0 0 10px #00ff00;
-}
-
-/* Описание магазина */
-.shop-description {
-    border-radius: 5px;
-    padding: 25px;
-    margin: 30px auto;
-    max-width: 800px;
-}
-
-.info-line {
-    display: flex;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
-}
-
-.info-line:last-child {
-    border-bottom: none;
-}
-
-.info-prefix {
-    color: #ff9900;
-    margin-right: 10px;
-    min-width: 30px;
-    text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
-}
-
-.info-text {
-    color: #ffffff;
-}
-
-/* Кибер-ссылки */
-.cyber-link {
-    color: #00ffff;
-    text-decoration: none;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-}
-
-.cyber-link:hover {
-    text-decoration: underline;
-    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
 }
 
 /* Заголовок экрана */
@@ -791,20 +835,22 @@ body {
     justify-content: center;
 }
 
-/* Время последнего обновления */
-.last-update {
-    color: #00ff00;
-    font-size: 0.9rem;
-    background: rgba(0, 255, 0, 0.1);
-    padding: 8px 15px;
-    border-radius: 3px;
-    border: 1px solid rgba(0, 255, 0, 0.3);
-}
-
 /* Адаптивность */
 @media (max-width: 768px) {
-    .typewriter {
+    .shop-title-main {
+        font-size: 3rem;
+        letter-spacing: 3px;
+    }
+    
+    .shop-title-sub {
         font-size: 1.8rem;
+        letter-spacing: 5px;
+    }
+    
+    .shop-title-sub::before,
+    .shop-title-sub::after {
+        margin: 0 10px;
+        font-size: 1.5rem;
     }
     
     .ascii-large {
