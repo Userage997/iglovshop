@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHOP IGLOVA — Номера & NFT</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <div class="terminal-container">
+        <!-- Экран 1: Главный -->
+        <section id="screen-1" class="screen active">
+            <div class="terminal-header">
+                <div class="prompt">root@iglova:~$</div>
+                <div class="status">
+                    <span class="status-indicator active"></span>
+                    <span>ОПЕРАЦИОННАЯ СИСТЕМА АКТИВНА</span>
+                </div>
+            </div>
+            
+            <div class="content">
+                <h1 class="typewriter">
+                    <span class="command-prefix">></span> SHOP IGLOVA
+                </h1>
+                
+                <div class="ascii-art">
+                    <pre class="ascii-large">
+███████╗██╗  ██╗ ██████╗ ██████╗      ██╗ ██████╗ ██╗      ██████╗ ██╗   ██╗ █████╗ 
+██╔════╝██║  ██║██╔═══██╗██╔══██╗     ██║██╔═══██╗██║     ██╔═══██╗██║   ██║██╔══██╗
+███████╗███████║██║   ██║██████╔╝     ██║██║   ██║██║     ██║   ██║██║   ██║███████║
+╚════██║██╔══██║██║   ██║██╔═══╝██   ██║██║   ██║██║     ██║   ██║██║   ██║██╔══██║
+███████║██║  ██║╚██████╔╝██║    ╚█████╔╝╚██████╔╝███████╗╚██████╔╝╚██████╔╝██║  ██║
+╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚════╝  ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+                    </pre>
+                </div>
+                
+                <div class="shop-description">
+                    <div class="info-line">
+                        <span class="info-prefix">>_</span>
+                        <span class="info-text">Продажа виртуальных и физических номеров</span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-prefix">>_</span>
+                        <span class="info-text">NFT аккаунты и цифровые активы</span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-prefix">>_</span>
+                        <span class="info-text">Гарантия качества • Быстрая доставка</span>
+                    </div>
+                </div>
+                
+                <div class="menu-grid">
+                    <button class="cyber-btn" data-target="screen-2">
+                        <span class="btn-number">[1]</span>
+                        <span class="btn-text">ПРОСМОТР ТОВАРОВ</span>
+                        <span class="btn-cursor">_</span>
+                    </button>
+                    
+                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn link-btn">
+                        <span class="btn-number">[2]</span>
+                        <span class="btn-text">СВЯЗЬ С ВЛАДЕЛЬЦЕМ</span>
+                        <span class="btn-external"><i class="fab fa-telegram"></i></span>
+                    </a>
+                </div>
+                
+                <div class="terminal-footer">
+                    <div class="command-line">
+                        <span class="prompt">customer@shop:~$</span>
+                        <span class="typing-text" id="typing-text"></span>
+                        <span class="cursor">█</span>
+                    </div>
+                    <div class="screen-indicator">
+                        <span class="indicator-dot active"></span>
+                        <span class="indicator-dot"></span>
+                        <span class="indicator-dot"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Экран 2: Товары -->
+        <section id="screen-2" class="screen">
+            <div class="terminal-header">
+                <button class="back-btn" data-target="screen-1">
+                    <i class="fas fa-arrow-left"></i> НАЗАД
+                </button>
+                <div class="prompt">root@iglova:~/products$</div>
+                <div class="last-update" id="last-update">Обновлено: загрузка...</div>
+            </div>
+            
+            <div class="content">
+                <h2 class="screen-title">
+                    <span class="command-prefix">></span> КАТАЛОГ ТОВАРОВ
+                </h2>
+                
+                <!-- Фильтры категорий -->
+                <div class="category-filter">
+                    <button class="category-btn active" data-category="all">ВСЕ ТОВАРЫ</button>
+                    <button class="category-btn" data-category="russian">🇷🇺 НОМЕРА РФ</button>
+                    <button class="category-btn" data-category="foreign">🌍 ЗАРУБЕЖНЫЕ</button>
+                    <button class="category-btn" data-category="nft_users">🎨 NFT ЮЗЕРЫ</button>
+                    <button class="category-btn" data-category="nft_gifts">🎁 NFT ПОДАРКИ</button>
+                </div>
+                
+                <!-- Контейнер для товаров -->
+                <div class="products-container" id="products-container">
+                    <div class="loading-products">
+                        <div class="loading-spinner"></div>
+                        <p>Загрузка товаров...</p>
+                    </div>
+                </div>
+                
+                <!-- Инфо -->
+                <div class="shop-info">
+                    <div class="info-line">
+                        <span class="info-prefix">$</span>
+                        <span class="info-text">Для покупки пишите в Telegram: <a href="https://t.me/useriglov" target="_blank">@useriglov</a></span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-prefix">$</span>
+                        <span class="info-text">Цены указаны за единицу товара</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Экран 3: Контакты (резервный) -->
+        <section id="screen-3" class="screen">
+            <div class="terminal-header">
+                <button class="back-btn" data-target="screen-1">
+                    <i class="fas fa-arrow-left"></i> НАЗАД
+                </button>
+                <div class="prompt">root@iglova:~/contacts$</div>
+            </div>
+            
+            <div class="content">
+                <h2 class="screen-title">
+                    <span class="command-prefix">></span> КОНТАКТЫ И ПОКУПКА
+                </h2>
+                
+                <div class="contacts-container">
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fab fa-telegram"></i></div>
+                        <div class="method-info">
+                            <h4>Владелец магазина</h4>
+                            <a href="https://t.me/useriglov" target="_blank" class="method-link">@useriglov</a>
+                            <p class="method-desc">Основной канал связи</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="method-info">
+                            <h4>Процесс покупки</h4>
+                            <p class="method-desc">1. Выберите товар<br>2. Напишите в Telegram<br>3. Получите инструкции по оплате<br>4. Получите товар</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons center-buttons">
+                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn primary">
+                        <span class="btn-number">[!]</span>
+                        <span>НАПИСАТЬ В TELEGRAM</span>
+                        <span class="btn-external"><i class="fab fa-telegram"></i></span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
