@@ -1255,6 +1255,47 @@ function updateWebsite() {
         }
     }
 }
+// В admin.js найти или создать эту функцию:
+function updateWebsiteFromDashboard() {
+    try {
+        // 1. Подготавливаем данные для сайта
+        const data = prepareDataForExport();
+        const jsonStr = JSON.stringify(data, null, 2);
+        
+        // 2. Сохраняем в localStorage (для мгновенного отображения)
+        localStorage.setItem('iglova_shop_products', jsonStr);
+        
+        // 3. Синхронизируем с другими вкладками
+        syncWithOtherTabs();
+        
+        // 4. Показываем уведомление
+        alert(`✅ Сайт обновлен!\nТоваров: ${allProducts.length}\nКатегорий: ${categories.length}`);
+        
+        // 5. Обновляем статистику на дашборде
+        updateDashboard();
+        
+        // 6. Добавляем запись в активность
+        const recentActivity = document.getElementById('recent-activity');
+        if (recentActivity) {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.innerHTML = `
+                <i class="fas fa-sync-alt" style="color: #00ff00;"></i>
+                <div class="activity-text">
+                    <p>Сайт обновлен</p>
+                    <small>${new Date().toLocaleTimeString('ru-RU')}</small>
+                </div>
+            `;
+            recentActivity.prepend(activityItem);
+        }
+        
+        console.log('[DASHBOARD] Сайт обновлен из главной панели');
+        
+    } catch (error) {
+        console.error('Ошибка обновления сайта:', error);
+        alert('❌ Ошибка обновления сайта');
+    }
+}
         
         // Создаем виртуальный файл
         const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
