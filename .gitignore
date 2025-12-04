@@ -1,0 +1,5 @@
+# Создайте файл .gitignore в корне
+admin/config.js
+.env
+*.log
+node_modules/
