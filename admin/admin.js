@@ -1185,7 +1185,6 @@ function processImportedData(data) {
     showFormStatus('success', `✅ Импортировано ${allProducts.length} товаров`);
 }
 
-// Обновление сайта
 function updateWebsite() {
     try {
         const data = prepareDataForExport();
@@ -1193,9 +1192,69 @@ function updateWebsite() {
         const statusElement = document.getElementById('update-site-status');
         
         if (!statusElement) {
-            showFormStatus('error', 'Элемент статуса не найден');
+            // ФИКС: Создаем элемент статуса, если его нет
+            showFormStatus('error', 'Элемент статуса не найден. Переключитесь на вкладку "Экспорт"');
             return;
         }
+        
+        // 1. Сохраняем в localStorage для немедленного отображения
+        localStorage.setItem('iglova_shop_products', jsonStr);
+        
+        // 2. Создаем файл для скачивания
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        
+        statusElement.innerHTML = `
+            <div class="status success">
+                <h4><i class="fas fa-check-circle"></i> Сайт обновлен!</h4>
+                <p>✅ Данные сохранены в браузере</p>
+                <p>Для обновления на GitHub:</p>
+                <ol>
+                    <li>Скачайте файл: 
+                        <a href="${url}" download="products.json" style="color: #00ffff; text-decoration: underline;">
+                            <i class="fas fa-download"></i> products.json
+                        </a>
+                    </li>
+                    <li>Замените файл в корне сайта</li>
+                    <li>Через 1-2 минуты изменения появятся на сайте</li>
+                </ol>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0,255,0,0.1); border: 1px solid #00ff00;">
+                    <p style="color: #00ff00; margin: 0;">
+                        <i class="fas fa-check"></i> <strong>Сейчас на сайте:</strong><br>
+                        Товаров: <strong>${data.categories.reduce((sum, cat) => sum + cat.products.length, 0)}</strong><br>
+                        Категорий: <strong>${data.categories.length}</strong>
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        // 3. Автоматически обновляем основную страницу (если она открыта)
+        try {
+            syncChannel.postMessage({
+                type: 'force_reload',
+                timestamp: new Date().toISOString()
+            });
+            console.log('[SYNC] Отправлен запрос на обновление сайта');
+        } catch (e) {
+            console.log('[SYNC] Не удалось отправить запрос');
+        }
+        
+        // 4. Очищаем URL через минуту
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 60000);
+        
+    } catch (error) {
+        const statusElement = document.getElementById('update-site-status');
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <div class="status error">
+                    <i class="fas fa-exclamation-circle"></i> Ошибка: ${error.message}
+                </div>
+            `;
+        }
+    }
+}
         
         // Создаем виртуальный файл
         const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
