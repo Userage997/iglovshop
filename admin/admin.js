@@ -1581,10 +1581,21 @@ function exportAllData() {
     showFormStatus('success', '📥 Все данные экспортированы');
 }
 
-// Обновление системной информации
 function updateSystemInfo() {
-    document.getElementById('last-update-info').textContent = getLastUpdate();
-    document.getElementById('browser-info').textContent = navigator.userAgent.split(' ')[0];
+    // ФИКС: Проверяем элементы перед обновлением
+    const lastUpdateElement = document.getElementById('last-update-info');
+    const browserInfoElement = document.getElementById('browser-info');
+    const storageInfoElement = document.getElementById('storage-info');
+    
+    if (lastUpdateElement) {
+        lastUpdateElement.textContent = getLastUpdate();
+    }
+    
+    if (browserInfoElement) {
+        browserInfoElement.textContent = navigator.userAgent.split(' ')[0];
+    }
+    
+    // ФИКС: Обновляем размер данных с проверкой
     updateDataSize();
 }
 
