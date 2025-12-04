@@ -32,6 +32,26 @@ let productsData = null;
 let lastLoadTime = 0;
 let currentCategory = 'all';
 
+// Слушаем обновления из админки
+let syncChannel;
+try {
+    syncChannel = new BroadcastChannel('iglova_shop_sync');
+    syncChannel.onmessage = function(event) {
+        if (event.data.type === 'data_updated') {
+            console.log('[SYNC] Получены обновленные данные из админки');
+            // Обновляем данные
+            productsData = event.data.data;
+            cacheData(productsData);
+            displayProducts(productsData);
+            
+            // Показываем уведомление
+            showUpdateStatus('🔄 Данные обновлены в реальном времени', 'success');
+        }
+    };
+} catch (e) {
+    console.log('[SYNC] BroadcastChannel не поддерживается');
+}
+
 // Главная функция инициализации
 document.addEventListener('DOMContentLoaded', function() {
     console.log(`[${SHOP_CONFIG.name}] v${SHOP_CONFIG.version} initialized`);
