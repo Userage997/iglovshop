@@ -301,6 +301,8 @@ async function loadProducts(silent = false) {
     const container = document.getElementById('products-container');
     const updateElement = document.getElementById('last-update');
     
+    console.log('[LOAD] Начинаю загрузку товаров...');
+    
     if (!container) return;
     
     // Показываем загрузку
@@ -320,7 +322,7 @@ async function loadProducts(silent = false) {
         const cachedData = getCachedData();
         
         if (cachedData && (now - lastLoadTime) < SHOP_CONFIG.cacheTime && !silent) {
-            console.log('[CACHE] Using cached data');
+            console.log('[CACHE] Использую кэшированные данные');
             productsData = cachedData;
             displayProducts(cachedData);
             updateLastUpdate(updateElement, cachedData.last_update, true);
@@ -328,7 +330,7 @@ async function loadProducts(silent = false) {
         }
         
         // Пробуем загрузить с сервера
-        console.log('[API] Fetching from server...');
+        console.log('[API] Пробую загрузить с сервера...');
         const serverData = await loadFromServer();
         
         if (serverData) {
@@ -337,12 +339,14 @@ async function loadProducts(silent = false) {
             cacheData(serverData);
             displayProducts(serverData);
             updateLastUpdate(updateElement, serverData.last_update);
-            console.log(`[API] Loaded ${countProducts(serverData)} products from server`);
+            console.log(`[API] Загружено ${countProducts(serverData)} товаров с сервера`);
             return;
         }
         
         // Пробуем загрузить из localStorage админки
-        console.log('[FALLBACK] Trying localStorage fallback...');
+        console.log('[FALLBACK] Пробую localStorage...');
+        console.log('[DEBUG] Ключи в localStorage:', Object.keys(localStorage));
+        
         const localData = await loadFromLocalStorage();
         
         if (localData) {
@@ -351,7 +355,7 @@ async function loadProducts(silent = false) {
             cacheData(localData);
             displayProducts(localData);
             updateLastUpdate(updateElement, localData.last_update, true);
-            console.log(`[FALLBACK] Loaded ${countProducts(localData)} products from localStorage`);
+            console.log(`[FALLBACK] Загружено ${countProducts(localData)} товаров из localStorage`);
             return;
         }
         
@@ -359,7 +363,7 @@ async function loadProducts(silent = false) {
         throw new Error('Не удалось загрузить данные из всех источников');
         
     } catch (error) {
-        console.error('[ERROR] Failed to load products:', error);
+        console.error('[ERROR] Ошибка загрузки товаров:', error);
         
         if (!silent) {
             showErrorMessage(container, error.message);
@@ -399,30 +403,46 @@ async function loadFromServer() {
 // Загрузка из localStorage
 async function loadFromLocalStorage() {
     try {
-        // Пробуем несколько ключей
+        // Пробуем несколько ключей - ВАЖНО: именно эти ключи использует админка!
         const keys = [
-            'iglova_shop_products',           // Новый ключ из админки
-            'iglova_shop_products_data',      // Ключ из конфига
-            'iglova_admin_data_v3'            // Ключ из админки
+            'iglova_shop_products',           // Основной ключ из админки
+            'iglova_admin_data_v3',           // Ключ из админки
+            'iglova_shop_products_data'       // Резервный ключ
         ];
         
         for (const key of keys) {
             const rawData = localStorage.getItem(key);
             if (rawData) {
-                console.log(`[STORAGE] Found data in key: ${key}`);
-                const parsedData = JSON.parse(rawData);
+                console.log(`[STORAGE] Найдены данные в ключе: ${key}`);
                 
-                // Преобразуем данные в правильный формат
-                const formattedData = formatDataForDisplay(parsedData);
-                if (formattedData) {
-                    return formattedData;
+                try {
+                    const parsedData = JSON.parse(rawData);
+                    
+                    // Проверяем несколько возможных форматов
+                    if (parsedData.categories && Array.isArray(parsedData.categories)) {
+                        // Формат 1: данные уже в правильной структуре
+                        console.log('[FORMAT] Данные в правильном формате');
+                        return parsedData;
+                    } else if (parsedData.products && Array.isArray(parsedData.products)) {
+                        // Формат 2: данные из админки (продукты отдельно)
+                        console.log('[FORMAT] Преобразуем данные из админки');
+                        return formatDataForDisplay(parsedData);
+                    } else if (parsedData.data && parsedData.data.categories) {
+                        // Формат 3: данные из кэша
+                        console.log('[FORMAT] Данные из кэша');
+                        return parsedData.data;
+                    }
+                } catch (parseError) {
+                    console.warn(`[ERROR] Ошибка парсинга данных из ключа ${key}:`, parseError);
+                    continue;
                 }
             }
         }
         
+        console.log('[STORAGE] Нет данных в localStorage');
         return null;
     } catch (error) {
-        console.warn('[STORAGE] Failed to load from localStorage:', error.message);
+        console.error('[ERROR] Ошибка загрузки из localStorage:', error);
         return null;
     }
 }
@@ -430,6 +450,8 @@ async function loadFromLocalStorage() {
 // Форматирование данных из админки для отображения
 function formatDataForDisplay(rawData) {
     try {
+        console.log('[FORMAT] Преобразование данных:', rawData);
+        
         // Если данные уже в правильном формате
         if (rawData.categories && Array.isArray(rawData.categories)) {
             return {
@@ -462,16 +484,20 @@ function formatDataForDisplay(rawData) {
                 }
             });
             
+            // Фильтруем только категории с товарами
+            const filteredCategories = categories.filter(cat => cat.products.length > 0);
+            
             return {
                 last_update: rawData.timestamp ? new Date(rawData.timestamp).toLocaleString('ru-RU') : 'Только что',
                 version: rawData.version || '1.0',
-                categories: categories.filter(cat => cat.products.length > 0)
+                categories: filteredCategories
             };
         }
         
+        console.warn('[FORMAT] Неизвестный формат данных:', rawData);
         return null;
     } catch (error) {
-        console.error('[FORMAT] Error formatting data:', error);
+        console.error('[FORMAT] Ошибка форматирования данных:', error);
         return null;
     }
 }
