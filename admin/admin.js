@@ -642,3 +642,6 @@ function showStatus(type, message) {
         statusElement.className = 'status';
     }, 5000);
 }
+const CONFIG = {
+    password: "everything229", // ЗАМЕНИТЕ!
+}
