@@ -1,7 +1,7 @@
 // ===== АДМИН-ПАНЕЛЬ IGLOV SHOP =====
 // Конфигурация
 const CONFIG = {
-    password: "maybelaterfuck", // ПАРОЛЬ ИЗМЕНЁН!
+    password: "maybelaterfuck",
     backupKey: "iglova_shop_backup_v3",
     storageKey: "iglova_admin_data_v3",
     version: "3.0",
@@ -11,7 +11,7 @@ const CONFIG = {
 // Глобальные переменные
 let allProducts = [];
 let categories = [
-    { id: "russian", name: "НОМЕРА РФ", icon: "🇷🇺", description: "Российские номера с гарантией отлета" },
+    { id: "russian", name: "НОМЕРА РФ", icon: "🇷🇺", description: "Российские номера с гарантией отлетa" },
     { id: "foreign", name: "ЗАРУБЕЖНЫЕ", icon: "🌍", description: "Номера других стран" },
     { id: "nft_users", name: "NFT ЮЗЕРЫ", icon: "🎨", description: "NFT аккаунты и профили" },
     { id: "nft_gifts", name: "NFT ПОДАРКИ", icon: "🎁", description: "Цифровые подарки и активы" }
@@ -1186,10 +1186,10 @@ function processImportedData(data) {
     showFormStatus('success', `✅ Импортировано ${allProducts.length} товаров`);
 }
 
-// ФУНКЦИЯ ДЛЯ ГЛАВНОЙ ПАНЕЛИ
+// ===== НОВАЯ ФУНКЦИЯ ДЛЯ ГЛАВНОЙ ПАНЕЛИ =====
 function updateWebsiteFromDashboard() {
     try {
-        // 1. Подготавливаем данные для сайта
+        // 1. Подготавливаем данные
         const data = prepareDataForExport();
         const jsonStr = JSON.stringify(data, null, 2);
         
@@ -1234,7 +1234,7 @@ function updateWebsiteFromDashboard() {
     }
 }
 
-// ФУНКЦИЯ ДЛЯ ВКЛАДКИ ЭКСПОРТ
+// ФУНКЦИЯ ДЛЯ ВКЛАДКИ ЭКСПОРТ (скачивание файла)
 function updateWebsite() {
     try {
         const data = prepareDataForExport();
@@ -1277,16 +1277,8 @@ function updateWebsite() {
             </div>
         `;
         
-        // 3. Автоматически обновляем основную страницу (если она открыта)
-        try {
-            syncChannel.postMessage({
-                type: 'force_reload',
-                timestamp: new Date().toISOString()
-            });
-            console.log('[SYNC] Отправлен запрос на обновление сайта');
-        } catch (e) {
-            console.log('[SYNC] Не удалось отправить запрос');
-        }
+        // 3. Синхронизируем с другими вкладками
+        syncWithOtherTabs();
         
         // 4. Очищаем URL через минуту
         setTimeout(() => {
@@ -1558,7 +1550,7 @@ function updateDataSize() {
     const sizeKB = (totalSize / 1024).toFixed(2);
     const element = document.getElementById('total-data-size');
     
-    // ФИКС: Проверяем, существует ли элемент, прежде чем изменять его
+    // Проверяем, существует ли элемент
     if (element) {
         element.textContent = `${sizeKB} КБ`;
     }
@@ -1641,10 +1633,9 @@ function exportAllData() {
 }
 
 function updateSystemInfo() {
-    // ФИКС: Проверяем элементы перед обновлением
+    // Проверяем элементы перед обновлением
     const lastUpdateElement = document.getElementById('last-update-info');
     const browserInfoElement = document.getElementById('browser-info');
-    const storageInfoElement = document.getElementById('storage-info');
     
     if (lastUpdateElement) {
         lastUpdateElement.textContent = getLastUpdate();
@@ -1654,7 +1645,7 @@ function updateSystemInfo() {
         browserInfoElement.textContent = navigator.userAgent.split(' ')[0];
     }
     
-    // ФИКС: Обновляем размер данных с проверкой
+    // Обновляем размер данных с проверкой
     updateDataSize();
 }
 
