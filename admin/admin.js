@@ -166,6 +166,7 @@ function showAdminPanel() {
 function logout() {
     if (confirm('Выйти из админ-панели?')) {
         localStorage.removeItem('admin_authenticated');
+        
         clearInterval(sessionTimer);
         location.reload();
     }
@@ -1171,22 +1172,29 @@ function updateWebsite() {
         const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         
+        // Сохраняем для основной страницы (чтобы сразу работало)
+        localStorage.setItem('iglova_shop_products', jsonStr);
+        
         statusElement.innerHTML = `
             <div class="status success">
                 <h4><i class="fas fa-check-circle"></i> Данные подготовлены!</h4>
-                <p>Для обновления сайта на GitHub:</p>
+                <p>Для обновления сайта:</p>
                 <ol>
                     <li>Скачайте файл: 
                         <a href="${url}" download="products.json" style="color: #00ffff; text-decoration: underline;">
                             <i class="fas fa-download"></i> products.json
                         </a>
                     </li>
-                    <li>Замените файл <code>products.json</code> в корне репозитория</li>
+                    <li>Замените файл <code>products.json</code> в корне сайта</li>
                     <li>Обновите страницу магазина (Ctrl+F5)</li>
                 </ol>
-                <p style="margin-top: 15px; color: #ff9900;">
+                <p style="margin-top: 15px; color: #00ff00;">
                     <i class="fas fa-info-circle"></i> Товаров: <strong>${allProducts.length}</strong><br>
+                    Категорий: <strong>${data.categories.length}</strong><br>
                     Дата: ${data.last_update}
+                </p>
+                <p style="color: #ff9900; margin-top: 10px; font-size: 0.9rem;">
+                    <i class="fas fa-lightbulb"></i> Данные уже сохранены в браузере и должны отображаться на сайте!
                 </p>
             </div>
         `;
@@ -1207,7 +1215,6 @@ function updateWebsite() {
         }
     }
 }
-
 // Обновление вкладки бэкапа
 function updateBackupTab() {
     const container = document.getElementById('tab-backup');
