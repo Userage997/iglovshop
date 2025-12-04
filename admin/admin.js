@@ -261,6 +261,9 @@ function loadFromStorage() {
             allProducts = data.products || [];
             categories = data.categories || categories;
             console.log(`[LOAD] Загружено ${allProducts.length} товаров, ${categories.length} категорий`);
+            
+            // Автоматически обновляем сайт при загрузке
+            autoUpdateWebsite();
         }
     } catch (e) {
         console.error('[ERROR] Ошибка загрузки из хранилища:', e);
@@ -268,7 +271,7 @@ function loadFromStorage() {
     }
 }
 
-// Сохранение данных в localStorage
+// Сохранение данных в localStorage и автообновление сайта
 function saveToStorage() {
     const data = {
         timestamp: new Date().toISOString(),
@@ -278,8 +281,33 @@ function saveToStorage() {
     };
     
     localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+    
+    // Автоматически обновляем сайт
+    autoUpdateWebsite();
+    
     updateUI();
     console.log(`[SAVE] Сохранено ${allProducts.length} товаров`);
+}
+
+// Автоматическое обновление сайта (без скачивания файла)
+function autoUpdateWebsite() {
+    try {
+        const exportData = prepareDataForExport();
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        
+        // Сохраняем в localStorage для сайта
+        localStorage.setItem('iglova_shop_products', jsonStr);
+        
+        console.log('[AUTO-UPDATE] Данные сохранены для сайта');
+        
+        // Показываем уведомление (опционально)
+        if (document.querySelector('.form-status')) {
+            showFormStatus('success', `✅ Сайт обновлен (${allProducts.length} товаров)`);
+        }
+        
+    } catch (error) {
+        console.error('[ERROR] Auto-update failed:', error);
+    }
 }
 
 // Обновление интерфейса
@@ -509,7 +537,7 @@ function addProduct() {
         showFormStatus('success', '✅ Товар успешно добавлен!');
     }
     
-    // Сохраняем
+    // Сохраняем и автоматически обновляем сайт
     saveToStorage();
     
     // Очищаем форму
@@ -546,7 +574,7 @@ function editProduct(index) {
 function deleteProduct(index) {
     if (confirm(`❌ Удалить товар "${allProducts[index].number}"?`)) {
         const deleted = allProducts.splice(index, 1)[0];
-        saveToStorage();
+        saveToStorage(); // Автоматически обновляем сайт
         showFormStatus('success', `🗑️ Товар "${deleted.number}" удален`);
     }
 }
@@ -773,7 +801,7 @@ function addNewCategory() {
         description: desc || 'Новая категория товаров'
     });
     
-    // Сохраняем
+    // Сохраняем и обновляем сайт
     saveToStorage();
     
     // Закрываем модальное окно
@@ -890,7 +918,7 @@ function updateExportTab() {
                     <i class="fas fa-cloud-upload-alt"></i>
                     <span>ОБНОВИТЬ САЙТ</span>
                 </button>
-                <p class="form-hint">Создаст файл products.json для загрузки на сайт</p>
+                <p class="form-hint">Создаст файл products.json для загрузки на GitHub</p>
                 <div id="update-site-status" class="form-status"></div>
             </div>
         </div>
@@ -917,6 +945,42 @@ function getLastUpdate() {
         }
     } catch (e) {}
     return 'Неизвестно';
+}
+
+// Подготовка данных для экспорта
+function prepareDataForExport() {
+    // Группируем товары по категориям
+    const groupedProducts = {};
+    categories.forEach(cat => {
+        groupedProducts[cat.id] = [];
+    });
+    
+    allProducts.forEach(product => {
+        if (groupedProducts[product.categoryId]) {
+            groupedProducts[product.categoryId].push({
+                number: product.number,
+                price: product.price,
+                months: product.months,
+                operator: product.operator,
+                description: product.description
+            });
+        }
+    });
+    
+    // Формируем финальную структуру
+    const result = {
+        last_update: new Date().toLocaleString('ru-RU'),
+        version: CONFIG.version,
+        categories: categories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            icon: cat.icon,
+            description: cat.description,
+            products: groupedProducts[cat.id] || []
+        }))
+    };
+    
+    return result;
 }
 
 // Экспорт в JSON
@@ -985,42 +1049,6 @@ async function copyToClipboard() {
     } catch (err) {
         showFormStatus('error', '❌ Ошибка копирования: ' + err.message);
     }
-}
-
-// Подготовка данных для экспорта
-function prepareDataForExport() {
-    // Группируем товары по категориям
-    const groupedProducts = {};
-    categories.forEach(cat => {
-        groupedProducts[cat.id] = [];
-    });
-    
-    allProducts.forEach(product => {
-        if (groupedProducts[product.categoryId]) {
-            groupedProducts[product.categoryId].push({
-                number: product.number,
-                price: product.price,
-                months: product.months,
-                operator: product.operator,
-                description: product.description
-            });
-        }
-    });
-    
-    // Формируем финальную структуру
-    const result = {
-        last_update: new Date().toLocaleString('ru-RU'),
-        version: CONFIG.version,
-        categories: categories.map(cat => ({
-            id: cat.id,
-            name: cat.name,
-            icon: cat.icon,
-            description: cat.description,
-            products: groupedProducts[cat.id] || []
-        }))
-    };
-    
-    return result;
 }
 
 // Импорт из файла
@@ -1146,14 +1174,14 @@ function updateWebsite() {
         statusElement.innerHTML = `
             <div class="status success">
                 <h4><i class="fas fa-check-circle"></i> Данные подготовлены!</h4>
-                <p>Для обновления сайта:</p>
+                <p>Для обновления сайта на GitHub:</p>
                 <ol>
                     <li>Скачайте файл: 
                         <a href="${url}" download="products.json" style="color: #00ffff; text-decoration: underline;">
                             <i class="fas fa-download"></i> products.json
                         </a>
                     </li>
-                    <li>Замените файл <code>products.json</code> в корне сайта</li>
+                    <li>Замените файл <code>products.json</code> в корне репозитория</li>
                     <li>Обновите страницу магазина (Ctrl+F5)</li>
                 </ol>
                 <p style="margin-top: 15px; color: #ff9900;">
@@ -1518,7 +1546,7 @@ function toggleMenu() {
     sidebar.classList.toggle('collapsed');
 }
 
-// Добавляем CSS анимацию shake
+// Добавляем CSS анимацию shake и стили
 const style = document.createElement('style');
 style.textContent = `
     @keyframes shake {
