@@ -315,35 +315,101 @@ async function loadProducts(silent = false) {
             return;
         }
         
-        // Загружаем данные
-        console.log('[API] Fetching products...');
+        // Пробуем загрузить с сервера
+        console.log('[API] Fetching products from server...');
         const timestamp = silent ? 't=' + now : 'nocache=' + Math.random();
         const response = await fetch(`${SHOP_CONFIG.productsUrl}?${timestamp}`);
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Валидация данных
+            if (!data.categories || !Array.isArray(data.categories)) {
+                throw new Error('Invalid products data structure');
+            }
+            
+            // Сохраняем в кэш
+            productsData = data;
+            lastLoadTime = now;
+            
+            // Отображаем товары
+            displayProducts(data);
+            
+            // Обновляем время
+            updateLastUpdate(updateElement, data.last_update);
+            
+            if (!silent) {
+                console.log(`[API] Loaded ${data.categories.reduce((sum, cat) => sum + (cat.products?.length || 0), 0)} products from server`);
+            }
+            return;
         }
         
-        const data = await response.json();
+        // Если файл не найден на сервере, пробуем получить из localStorage админки
+        console.log('[FALLBACK] Server file not found, trying localStorage...');
         
-        // Валидация данных
-        if (!data.categories || !Array.isArray(data.categories)) {
-            throw new Error('Invalid products data structure');
+        // Пробуем получить данные из админского хранилища
+        const adminData = localStorage.getItem('iglova_shop_products') || localStorage.getItem('iglova_admin_data_v3');
+        
+        if (adminData) {
+            let data;
+            try {
+                const parsed = JSON.parse(adminData);
+                
+                // Проверяем формат данных
+                if (parsed.categories && Array.isArray(parsed.categories)) {
+                    // Это уже правильный формат из админки
+                    data = parsed;
+                } else if (parsed.products && Array.isArray(parsed.products)) {
+                    // Это данные из админского хранилища, нужно преобразовать
+                    data = {
+                        last_update: parsed.timestamp ? new Date(parsed.timestamp).toLocaleString('ru-RU') : 'Только что',
+                        version: parsed.version || '1.0',
+                        categories: []
+                    };
+                    
+                    // Группируем товары по категориям
+                    const categoriesMap = {};
+                    parsed.categories?.forEach(cat => {
+                        categoriesMap[cat.id] = {
+                            id: cat.id,
+                            name: cat.name,
+                            icon: cat.icon,
+                            description: cat.description,
+                            products: []
+                        };
+                    });
+                    
+                    // Добавляем товары в категории
+                    parsed.products?.forEach(product => {
+                        if (categoriesMap[product.categoryId]) {
+                            categoriesMap[product.categoryId].products.push({
+                                number: product.number,
+                                price: product.price,
+                                months: product.months,
+                                operator: product.operator,
+                                description: product.description
+                            });
+                        }
+                    });
+                    
+                    data.categories = Object.values(categoriesMap);
+                }
+                
+                if (data && data.categories) {
+                    productsData = data;
+                    lastLoadTime = now;
+                    displayProducts(data);
+                    updateLastUpdate(updateElement, data.last_update, true);
+                    console.log(`[FALLBACK] Loaded ${data.categories.reduce((sum, cat) => sum + (cat.products?.length || 0), 0)} products from localStorage`);
+                    return;
+                }
+            } catch (e) {
+                console.error('[ERROR] Failed to parse localStorage data:', e);
+            }
         }
         
-        // Сохраняем в кэш
-        productsData = data;
-        lastLoadTime = now;
-        
-        // Отображаем товары
-        displayProducts(data);
-        
-        // Обновляем время
-        updateLastUpdate(updateElement, data.last_update);
-        
-        if (!silent) {
-            console.log(`[API] Loaded ${data.categories.reduce((sum, cat) => sum + (cat.products?.length || 0), 0)} products`);
-        }
+        // Если ничего не получилось
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         
     } catch (error) {
         console.error('[ERROR] Failed to load products:', error);
