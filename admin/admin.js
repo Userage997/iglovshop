@@ -1496,7 +1496,18 @@ function updateDataSize() {
     }
     
     const sizeKB = (totalSize / 1024).toFixed(2);
-    document.getElementById('total-data-size').textContent = `${sizeKB} КБ`;
+    const element = document.getElementById('total-data-size');
+    
+    // ФИКС: Проверяем, существует ли элемент, прежде чем изменять его
+    if (element) {
+        element.textContent = `${sizeKB} КБ`;
+    }
+    
+    // Также обновляем другие элементы с информацией о хранилище
+    const storageInfoElement = document.getElementById('storage-info');
+    if (storageInfoElement) {
+        storageInfoElement.textContent = `${sizeKB} КБ`;
+    }
 }
 
 function changePassword() {
