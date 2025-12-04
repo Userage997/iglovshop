@@ -1,4 +1,4 @@
-// ===== АДМИН-ПАНЕЛЬ IGLOV SHOP =====
+     // ===== АДМИН-ПАНЕЛЬ IGLOV SHOP =====
 // Конфигурация
 const CONFIG = {
     password: "maybelaterfuck", // ПАРОЛЬ ИЗМЕНЁН!
@@ -282,6 +282,13 @@ function saveToStorage() {
     };
     
     localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+    
+    // Автоматически обновляем сайт при каждом сохранении
+    autoUpdateWebsite();
+    
+    updateUI();
+    console.log(`[SAVE] Сохранено ${allProducts.length} товаров`);
+}
     
     // Автоматически обновляем сайт
     autoUpdateWebsite();
