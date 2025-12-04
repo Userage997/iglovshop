@@ -4,348 +4,551 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель IGLOV SHOP</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Courier New', monospace;
-            background: #0a0a0a;
-            color: #00ff00;
-            padding: 20px;
-        }
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(0, 20, 0, 0.2);
-            border: 1px solid #00ff00;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        h1 { 
-            color: #00ff00;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #00ff00;
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 10px;
-        }
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-        .tab-btn {
-            background: rgba(0, 40, 0, 0.5);
-            border: 1px solid #333;
-            color: #888;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 3px 3px 0 0;
-        }
-        .tab-btn.active {
-            background: rgba(0, 60, 0, 0.7);
-            border-color: #00ff00;
-            color: #00ff00;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #00ffff;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-            color: #00ff00;
-            font-family: inherit;
-            border-radius: 3px;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-        }
-        .btn {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 3px;
-            font-family: inherit;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        .btn:hover {
-            background: rgba(0, 255, 0, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-        .btn-primary {
-            background: rgba(0, 100, 255, 0.2);
-            border-color: #0066ff;
-            color: #66aaff;
-        }
-        .btn-danger {
-            background: rgba(255, 0, 0, 0.1);
-            border-color: #ff3333;
-            color: #ff6666;
-        }
-        .products-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .products-table th {
-            background: rgba(0, 40, 0, 0.5);
-            color: #00ff00;
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #333;
-        }
-        .products-table td {
-            padding: 10px;
-            border: 1px solid #333;
-            color: #ccc;
-        }
-        .action-btn {
-            padding: 5px 10px;
-            margin: 0 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 3px;
-            font-family: inherit;
-        }
-        .edit-btn {
-            background: rgba(0, 100, 255, 0.2);
-            color: #66aaff;
-            border: 1px solid #0066ff;
-        }
-        .delete-btn {
-            background: rgba(255, 0, 0, 0.1);
-            color: #ff6666;
-            border: 1px solid #ff3333;
-        }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 3px;
-            display: none;
-        }
-        .status.success {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            display: block;
-        }
-        .status.error {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #ff3333;
-            color: #ff6666;
-            display: block;
-        }
-        .help-text {
-            color: #888;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-        .password-screen {
-            text-align: center;
-            padding: 50px;
-        }
-        .password-input {
-            width: 300px;
-            margin: 20px auto;
-        }
-    </style>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Сканирующая линия -->
+    <div class="scan-line-admin"></div>
+    
     <!-- Экран ввода пароля -->
-    <div id="password-screen" class="password-screen">
-        <h1>🔐 АДМИН-ПАНЕЛЬ IGLOV SHOP</h1>
-        <p>Введите пароль для доступа:</p>
-        <div class="form-group password-input">
-            <input type="password" id="admin-password" placeholder="Введите пароль">
-            <p class="help-text">Пароль предоставляет продавец</p>
-        </div>
-        <button class="btn" onclick="checkPassword()">ВОЙТИ</button>
-        <div id="password-error" class="status error" style="display: none;">
-            Неверный пароль
+    <div id="password-screen" class="login-screen">
+        <div class="login-container">
+            <div class="login-box">
+                <!-- Эффект мигающих углов -->
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h1 class="login-title">IGLOV SHOP</h1>
+                    <h2 class="login-subtitle">АДМИНИСТРАТИВНАЯ ПАНЕЛЬ</h2>
+                    <div class="login-status">
+                        <span class="status-dot active"></span>
+                        <span class="status-text">СИСТЕМА ГИБЕРНАЦИИ</span>
+                    </div>
+                </div>
+                
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="admin-password" class="form-label">
+                            <i class="fas fa-key"></i> ВВЕДИТЕ ПАРОЛЬ ДОСТУПА
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" 
+                                   id="admin-password" 
+                                   class="cyber-input password-input"
+                                   placeholder="············"
+                                   autocomplete="off"
+                                   onkeypress="if(event.key === 'Enter') checkPassword()">
+                            <button class="password-toggle" type="button" onclick="togglePasswordVisibility()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-hints">
+                            <div class="hint-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Доступ только для @useriglov</span>
+                            </div>
+                            <div class="hint-item">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Неверные попытки логируются</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="cyber-btn login-btn" onclick="checkPassword()">
+                            <span class="btn-icon"><i class="fas fa-sign-in-alt"></i></span>
+                            <span class="btn-text">ПОДКЛЮЧИТЬСЯ К СИСТЕМЕ</span>
+                            <span class="btn-loader" id="login-loader"></span>
+                        </button>
+                        
+                        <a href="../index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Вернуться в магазин</span>
+                        </a>
+                    </div>
+                    
+                    <div id="password-error" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="error-text">Неверный пароль доступа</span>
+                    </div>
+                    
+                    <div class="login-footer">
+                        <div class="security-info">
+                            <i class="fas fa-lock"></i>
+                            <span>Защищённое соединение • v2.0</span>
+                        </div>
+                        <div class="timestamp" id="login-timestamp">
+                            <!-- Время будет заполнено JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Терминальные сообщения -->
+            <div class="terminal-messages">
+                <div class="terminal-line">
+                    <span class="prompt">root@admin:~$</span>
+                    <span class="command">sudo systemctl start iglov-admin</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">root@admin:~$</span>
+                    <span class="output">Инициализация защищённого канала...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">root@admin:~$</span>
+                    <span class="output">Ожидание аутентификации</span>
+                    <span class="cursor">█</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Основная админ-панель (скрыта до ввода пароля) -->
-    <div id="admin-panel" class="admin-container" style="display: none;">
-        <h1>🛠️ АДМИН-ПАНЕЛЬ IGLOV SHOP</h1>
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <div class="admin-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="admin-brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>IGLOV SHOP <span class="brand-badge">ADMIN</span></h1>
+                        <p class="brand-subtitle">Панель управления магазином</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="admin-info">
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <span>@useriglov</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="session-timer">00:00:00</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-database"></i>
+                        <span id="data-counter">0 товаров</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+        </div>
         
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('products')">📦 ТОВАРЫ</button>
-            <button class="tab-btn" onclick="switchTab('add')">➕ ДОБАВИТЬ ТОВАР</button>
-            <button class="tab-btn" onclick="switchTab('categories')">📁 КАТЕГОРИИ</button>
-            <button class="tab-btn" onclick="switchTab('export')">📤 ЭКСПОРТ</button>
-        </div>
-
-        <!-- Вкладка: Список товаров -->
-        <div id="tab-products" class="tab-content active">
-            <h2>Список товаров</h2>
-            <div class="form-group">
-                <input type="text" id="search-products" placeholder="🔍 Поиск по номеру или описанию..." 
-                       onkeyup="filterProducts()">
-            </div>
-            <table class="products-table" id="products-table">
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Номер</th>
-                        <th>Цена</th>
-                        <th>Категория</th>
-                        <th>Отлет (мес)</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="products-list">
-                    <!-- Товары загружаются динамически -->
-                </tbody>
-            </table>
-            <div id="products-count" style="margin-top: 10px; color: #888;"></div>
-        </div>
-
-        <!-- Вкладка: Добавить товар -->
-        <div id="tab-add" class="tab-content">
-            <h2>Добавить новый товар</h2>
-            <form id="add-product-form">
-                <div class="form-group">
-                    <label for="product-number">Номер телефона:</label>
-                    <input type="text" id="product-number" required 
-                           placeholder="+79211234567">
-                    <p class="help-text">Формат: +7XXXXXXXXXX</p>
+        <div class="admin-container">
+            <!-- Боковое меню -->
+            <div class="admin-sidebar">
+                <div class="sidebar-header">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <div class="user-info">
+                        <h3>Администратор</h3>
+                        <p>Уровень доступа: <span class="access-level">MASTER</span></p>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="product-price">Цена (₽):</label>
-                    <input type="text" id="product-price" required 
-                           placeholder="150">
-                    <p class="help-text">Только цифры</p>
-                </div>
+                <nav class="sidebar-menu">
+                    <button class="menu-item active" onclick="switchTab('dashboard')">
+                        <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                        <span class="menu-text">Главная панель</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('products')">
+                        <span class="menu-icon"><i class="fas fa-box"></i></span>
+                        <span class="menu-text">Управление товарами</span>
+                        <span class="menu-badge" id="products-count-badge">0</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('add-product')">
+                        <span class="menu-icon"><i class="fas fa-plus-circle"></i></span>
+                        <span class="menu-text">Добавить товар</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('categories')">
+                        <span class="menu-icon"><i class="fas fa-folder"></i></span>
+                        <span class="menu-text">Категории</span>
+                        <span class="menu-badge" id="categories-count-badge">4</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('export')">
+                        <span class="menu-icon"><i class="fas fa-download"></i></span>
+                        <span class="menu-text">Экспорт данных</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('backup')">
+                        <span class="menu-icon"><i class="fas fa-hdd"></i></span>
+                        <span class="menu-text">Резервные копии</span>
+                    </button>
+                    
+                    <button class="menu-item" onclick="switchTab('settings')">
+                        <span class="menu-icon"><i class="fas fa-cog"></i></span>
+                        <span class="menu-text">Настройки</span>
+                    </button>
+                </nav>
                 
-                <div class="form-group">
-                    <label for="product-months">Срок отлета:</label>
-                    <select id="product-months">
-                        <option value="?">Неизвестно</option>
-                        <option value="1">1 месяц</option>
-                        <option value="3">3 месяца</option>
-                        <option value="6">6 месяцев</option>
-                        <option value="9">9 месяцев</option>
-                        <option value="12">12 месяцев</option>
-                    </select>
+                <div class="sidebar-footer">
+                    <div class="system-status">
+                        <div class="status-indicator online"></div>
+                        <span>Система активна</span>
+                    </div>
+                    <div class="version">v2.0</div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="product-operator">Оператор:</label>
-                    <select id="product-operator">
-                        <option value="">Не указано</option>
-                        <option value="МТС">МТС</option>
-                        <option value="Мегафон">Мегафон</option>
-                        <option value="Билайн">Билайн</option>
-                        <option value="Теле2">Теле2</option>
-                        <option value="Yota">Yota</option>
-                        <option value="Другой">Другой</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="product-category">Категория:</label>
-                    <select id="product-category" required>
-                        <option value="russian">🇷🇺 НОМЕРА РФ</option>
-                        <option value="foreign">🌍 ЗАРУБЕЖНЫЕ</option>
-                        <option value="nft_users">🎨 NFT ЮЗЕРЫ</option>
-                        <option value="nft_gifts">🎁 NFT ПОДАРКИ</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="product-description">Описание (необязательно):</label>
-                    <textarea id="product-description" rows="3" 
-                              placeholder="Отлетает через 9 месяцев, гарантия..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">💾 СОХРАНИТЬ ТОВАР</button>
-                <button type="button" class="btn" onclick="resetForm()">🗑️ ОЧИСТИТЬ</button>
-            </form>
-            <div id="add-status" class="status"></div>
-        </div>
-
-        <!-- Вкладка: Управление категориями -->
-        <div id="tab-categories" class="tab-content">
-            <h2>Управление категориями</h2>
-            <div class="form-group">
-                <label>Текущие категории:</label>
-                <div id="categories-list"></div>
-            </div>
-            <h3>Добавить новую категорию</h3>
-            <div class="form-group">
-                <label for="new-category-name">Название категории:</label>
-                <input type="text" id="new-category-name" placeholder="Например: Премиум номера">
-            </div>
-            <div class="form-group">
-                <label for="new-category-icon">Иконка (эмодзи):</label>
-                <input type="text" id="new-category-icon" placeholder="⭐">
-            </div>
-            <div class="form-group">
-                <label for="new-category-id">ID категории (англ. буквы):</label>
-                <input type="text" id="new-category-id" placeholder="premium">
-                <p class="help-text">Только английские буквы, без пробелов (например: premium_numbers)</p>
-            </div>
-            <button class="btn btn-primary" onclick="addCategory()">➕ ДОБАВИТЬ КАТЕГОРИЮ</button>
-        </div>
-
-        <!-- Вкладка: Экспорт и обновление -->
-        <div id="tab-export" class="tab-content">
-            <h2>Экспорт и обновление</h2>
-            <div class="form-group">
-                <p>Текущий статус: <span id="data-status">Загрузка...</span></p>
-                <p>Всего товаров: <span id="total-products">0</span></p>
-                <p>Последнее обновление: <span id="last-update-admin">Неизвестно</span></p>
             </div>
             
-            <div class="form-group">
-                <h3>Экспорт данных</h3>
-                <button class="btn" onclick="exportToJSON()">📥 Экспорт в JSON</button>
-                <button class="btn" onclick="exportToCSV()">📊 Экспорт в CSV</button>
-                <button class="btn" onclick="copyToClipboard()">📋 Копировать JSON</button>
+            <!-- Основное содержимое -->
+            <div class="admin-content">
+                <!-- Вкладка: Главная панель -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <div class="dashboard-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> Главная панель</h2>
+                        <div class="dashboard-actions">
+                            <button class="action-btn" onclick="updateWebsite()">
+                                <i class="fas fa-sync-alt"></i> Обновить сайт
+                            </button>
+                            <button class="action-btn primary" onclick="switchTab('add-product')">
+                                <i class="fas fa-plus"></i> Добавить товар
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(0, 255, 0, 0.1); color: #00ff00;">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-products-stat">0</h3>
+                                <p>Всего товаров</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(0, 255, 255, 0.1); color: #00ffff;">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-categories-stat">4</h3>
+                                <p>Категорий</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(255, 153, 0, 0.1); color: #ff9900;">
+                                <i class="fas fa-ruble-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-value-stat">0 ₽</h3>
+                                <p>Общая стоимость</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(255, 0, 255, 0.1); color: #ff00ff;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="session-time-stat">00:00</h3>
+                                <p>Время сессии</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-sections">
+                        <div class="section-card">
+                            <h3><i class="fas fa-chart-line"></i> Быстрые действия</h3>
+                            <div class="quick-actions">
+                                <button class="quick-btn" onclick="exportToJSON()">
+                                    <i class="fas fa-file-export"></i>
+                                    <span>Экспорт JSON</span>
+                                </button>
+                                <button class="quick-btn" onclick="createBackup()">
+                                    <i class="fas fa-save"></i>
+                                    <span>Создать бэкап</span>
+                                </button>
+                                <button class="quick-btn" onclick="window.open('../index.html', '_blank')">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Открыть магазин</span>
+                                </button>
+                                <button class="quick-btn" onclick="loadFromStorage()">
+                                    <i class="fas fa-redo"></i>
+                                    <span>Обновить данные</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="section-card">
+                            <h3><i class="fas fa-history"></i> Последние изменения</h3>
+                            <div class="recent-activity" id="recent-activity">
+                                <div class="activity-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="activity-text">
+                                        <p>Загрузите данные для просмотра активности</p>
+                                        <small>Нет данных</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="system-info">
+                        <h3><i class="fas fa-info-circle"></i> Системная информация</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Версия админки:</span>
+                                <span class="info-value">2.0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Последнее обновление:</span>
+                                <span class="info-value" id="last-update-info">Неизвестно</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Браузер:</span>
+                                <span class="info-value" id="browser-info">Загрузка...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Локальное хранилище:</span>
+                                <span class="info-value" id="storage-info">Загрузка...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Вкладка: Управление товарами -->
+                <div id="tab-products" class="tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-box"></i> Управление товарами</h2>
+                        <div class="tab-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" 
+                                       id="search-products" 
+                                       placeholder="Поиск по номеру или описанию..."
+                                       onkeyup="filterProducts()">
+                            </div>
+                            <button class="action-btn" onclick="switchTab('add-product')">
+                                <i class="fas fa-plus"></i> Добавить
+                            </button>
+                            <button class="action-btn" onclick="exportToCSV()">
+                                <i class="fas fa-download"></i> Экспорт CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="products-table-container">
+                        <table class="products-table" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">№</th>
+                                    <th>Номер / Название</th>
+                                    <th width="120">Цена</th>
+                                    <th width="150">Категория</th>
+                                    <th width="100">Отлет</th>
+                                    <th width="120">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-list">
+                                <!-- Товары загружаются динамически -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="table-info" id="products-table-info">
+                            Показано 0 товаров из 0
+                        </div>
+                        <div class="table-pagination">
+                            <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                            <span class="page-info">Страница 1</span>
+                            <button class="page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Вкладка: Добавить товар -->
+                <div id="tab-add-product" class="tab-content">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-plus-circle"></i> Добавить новый товар</h2>
+                        <div class="tab-actions">
+                            <button class="action-btn" onclick="resetProductForm()">
+                                <i class="fas fa-redo"></i> Очистить
+                            </button>
+                            <button class="action-btn" onclick="switchTab('products')">
+                                <i class="fas fa-list"></i> К списку
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="add-product-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-number">
+                                    <i class="fas fa-phone"></i> Номер телефона *
+                                </label>
+                                <input type="text" 
+                                       id="product-number" 
+                                       class="cyber-input"
+                                       placeholder="+79211234567"
+                                       required>
+                                <p class="form-hint">Формат: +7XXXXXXXXXX или название NFT товара</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="product-price">
+                                    <i class="fas fa-tag"></i> Цена (₽) *
+                                </label>
+                                <input type="text" 
+                                       id="product-price" 
+                                       class="cyber-input"
+                                       placeholder="150"
+                                       required>
+                                <p class="form-hint">Только цифры</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-months">
+                                    <i class="fas fa-calendar-alt"></i> Срок отлета
+                                </label>
+                                <select id="product-months" class="cyber-input">
+                                    <option value="?">Неизвестно</option>
+                                    <option value="1">1 месяц</option>
+                                    <option value="3">3 месяца</option>
+                                    <option value="6">6 месяцев (🔥)</option>
+                                    <option value="9">9 месяцев (🔥)</option>
+                                    <option value="12">12 месяцев (🔥)</option>
+                                    <option value="permanent">Постоянный</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="product-operator">
+                                    <i class="fas fa-sim-card"></i> Оператор
+                                </label>
+                                <select id="product-operator" class="cyber-input">
+                                    <option value="">Не указано</option>
+                                    <option value="МТС">МТС</option>
+                                    <option value="Мегафон">Мегафон</option>
+                                    <option value="Билайн">Билайн</option>
+                                    <option value="Теле2">Теле2</option>
+                                    <option value="Yota">Yota</option>
+                                    <option value="Telegram">Telegram</option>
+                                    <option value="Другой">Другой</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-category">
+                                    <i class="fas fa-folder"></i> Категория *
+                                </label>
+                                <select id="product-category" class="cyber-input" required>
+                                    <option value="russian">🇷🇺 НОМЕРА РФ</option>
+                                    <option value="foreign">🌍 ЗАРУБЕЖНЫЕ</option>
+                                    <option value="nft_users">🎨 NFT ЮЗЕРЫ</option>
+                                    <option value="nft_gifts">🎁 NFT ПОДАРКИ</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="product-description">
+                                    <i class="fas fa-align-left"></i> Описание
+                                </label>
+                                <textarea id="product-description" 
+                                          class="cyber-input" 
+                                          rows="3"
+                                          placeholder="Отлетает через 9 месяцев, гарантия... (необязательно)"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" 
+                                    class="cyber-btn primary large" 
+                                    onclick="addProduct()"
+                                    id="add-product-btn">
+                                <i class="fas fa-save"></i>
+                                <span>СОХРАНИТЬ ТОВАР</span>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="cyber-btn large" 
+                                    onclick="resetProductForm()">
+                                <i class="fas fa-times"></i>
+                                <span>ОЧИСТИТЬ ФОРМУ</span>
+                            </button>
+                        </div>
+                        
+                        <div id="add-product-status" class="form-status"></div>
+                    </div>
+                    
+                    <div class="form-preview">
+                        <h3><i class="fas fa-eye"></i> Предпросмотр карточки</h3>
+                        <div class="preview-card" id="product-preview">
+                            <div class="preview-header">
+                                <div class="preview-number">+7 (XXX) XXX-XX-XX</div>
+                                <div class="preview-price">0 ₽</div>
+                            </div>
+                            <div class="preview-desc">Описание отсутствует</div>
+                            <div class="preview-details">
+                                <div class="detail-item">
+                                    <span>Срок отлета:</span>
+                                    <span>Неизвестно</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Оператор:</span>
+                                    <span>Не указано</span>
+                                </div>
+                            </div>
+                            <div class="preview-category">🇷🇺 НОМЕРА РФ</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Остальные вкладки будут заполнены в admin.js -->
+                <div id="tab-categories" class="tab-content">
+                    <!-- Будет заполнено JS -->
+                </div>
+                
+                <div id="tab-export" class="tab-content">
+                    <!-- Будет заполнено JS -->
+                </div>
+                
+                <div id="tab-backup" class="tab-content">
+                    <!-- Будет заполнено JS -->
+                </div>
+                
+                <div id="tab-settings" class="tab-content">
+                    <!-- Будет заполнено JS -->
+                </div>
             </div>
-            
-            <div class="form-group">
-                <h3>Импорт данных</h3>
-                <input type="file" id="import-file" accept=".json,.csv" style="display: none;">
-                <button class="btn" onclick="document.getElementById('import-file').click()">
-                    📤 Импорт из файла
-                </button>
-                <p class="help-text">Поддерживаются JSON и CSV форматы</p>
-            </div>
-            
-            <div class="form-group">
-                <h3>Обновление сайта</h3>
-                <button class="btn btn-primary" onclick="updateWebsite()">
-                    🔄 ОБНОВИТЬ САЙТ
-                </button>
-                <p class="help-text">Отправляет обновленные данные на сайт</p>
-                <div id="update-status" class="status"></div>
-            </div>
-            
-            <div class="form-group">
-                <h3>Резервное копирование</h3>
-                <button class="btn" onclick="createBackup()">💾 Создать бэкап</button>
-                <button class="btn" onclick="restoreBackup()">🔄 Восстановить из бэкапа</button>
+        </div>
+        
+        <div class="admin-footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <span><i class="fas fa-shield-alt"></i> Защищённое соединение • IGLOV SHOP © 2025</span>
+                </div>
+                <div class="footer-right">
+                    <span id="current-time">--:--:--</span>
+                </div>
             </div>
         </div>
     </div>
