@@ -310,7 +310,8 @@ function syncWithOtherTabs() {
         syncChannel.postMessage({
             type: 'data_updated',
             data: data,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            source: 'admin_panel'
         });
         
         console.log('[SYNC] Данные отправлены другим вкладкам');
@@ -1185,6 +1186,55 @@ function processImportedData(data) {
     showFormStatus('success', `✅ Импортировано ${allProducts.length} товаров`);
 }
 
+// ФУНКЦИЯ ДЛЯ ГЛАВНОЙ ПАНЕЛИ
+function updateWebsiteFromDashboard() {
+    try {
+        // 1. Подготавливаем данные для сайта
+        const data = prepareDataForExport();
+        const jsonStr = JSON.stringify(data, null, 2);
+        
+        // 2. Сохраняем в localStorage (для мгновенного отображения)
+        localStorage.setItem('iglova_shop_products', jsonStr);
+        
+        // 3. Синхронизируем с другими вкладками
+        syncWithOtherTabs();
+        
+        // 4. Показываем уведомление
+        showFormStatus('success', `✅ Сайт обновлен! Товаров: ${allProducts.length}, Категорий: ${categories.length}`);
+        
+        // 5. Обновляем статистику на дашборде
+        updateDashboard();
+        
+        // 6. Добавляем запись в активность
+        const recentActivity = document.getElementById('recent-activity');
+        if (recentActivity) {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.innerHTML = `
+                <i class="fas fa-sync-alt" style="color: #00ff00;"></i>
+                <div class="activity-text">
+                    <p>Сайт обновлен</p>
+                    <small>${new Date().toLocaleTimeString('ru-RU')}</small>
+                </div>
+            `;
+            recentActivity.prepend(activityItem);
+            
+            // Ограничиваем количество записей
+            const items = recentActivity.querySelectorAll('.activity-item');
+            if (items.length > 5) {
+                items[items.length - 1].remove();
+            }
+        }
+        
+        console.log('[DASHBOARD] Сайт обновлен из главной панели');
+        
+    } catch (error) {
+        console.error('Ошибка обновления сайта:', error);
+        showFormStatus('error', '❌ Ошибка обновления сайта');
+    }
+}
+
+// ФУНКЦИЯ ДЛЯ ВКЛАДКИ ЭКСПОРТ
 function updateWebsite() {
     try {
         const data = prepareDataForExport();
@@ -1192,7 +1242,6 @@ function updateWebsite() {
         const statusElement = document.getElementById('update-site-status');
         
         if (!statusElement) {
-            // ФИКС: Создаем элемент статуса, если его нет
             showFormStatus('error', 'Элемент статуса не найден. Переключитесь на вкладку "Экспорт"');
             return;
         }
@@ -1240,95 +1289,6 @@ function updateWebsite() {
         }
         
         // 4. Очищаем URL через минуту
-        setTimeout(() => {
-            URL.revokeObjectURL(url);
-        }, 60000);
-        
-    } catch (error) {
-        const statusElement = document.getElementById('update-site-status');
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <div class="status error">
-                    <i class="fas fa-exclamation-circle"></i> Ошибка: ${error.message}
-                </div>
-            `;
-        }
-    }
-}
-// В admin.js найти или создать эту функцию:
-function updateWebsiteFromDashboard() {
-    try {
-        // 1. Подготавливаем данные для сайта
-        const data = prepareDataForExport();
-        const jsonStr = JSON.stringify(data, null, 2);
-        
-        // 2. Сохраняем в localStorage (для мгновенного отображения)
-        localStorage.setItem('iglova_shop_products', jsonStr);
-        
-        // 3. Синхронизируем с другими вкладками
-        syncWithOtherTabs();
-        
-        // 4. Показываем уведомление
-        alert(`✅ Сайт обновлен!\nТоваров: ${allProducts.length}\nКатегорий: ${categories.length}`);
-        
-        // 5. Обновляем статистику на дашборде
-        updateDashboard();
-        
-        // 6. Добавляем запись в активность
-        const recentActivity = document.getElementById('recent-activity');
-        if (recentActivity) {
-            const activityItem = document.createElement('div');
-            activityItem.className = 'activity-item';
-            activityItem.innerHTML = `
-                <i class="fas fa-sync-alt" style="color: #00ff00;"></i>
-                <div class="activity-text">
-                    <p>Сайт обновлен</p>
-                    <small>${new Date().toLocaleTimeString('ru-RU')}</small>
-                </div>
-            `;
-            recentActivity.prepend(activityItem);
-        }
-        
-        console.log('[DASHBOARD] Сайт обновлен из главной панели');
-        
-    } catch (error) {
-        console.error('Ошибка обновления сайта:', error);
-        alert('❌ Ошибка обновления сайта');
-    }
-}
-        
-        // Создаем виртуальный файл
-        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        
-        // Сохраняем для основной страницы (чтобы сразу работало)
-        localStorage.setItem('iglova_shop_products', jsonStr);
-        
-        statusElement.innerHTML = `
-            <div class="status success">
-                <h4><i class="fas fa-check-circle"></i> Данные подготовлены!</h4>
-                <p>Для обновления сайта:</p>
-                <ol>
-                    <li>Скачайте файл: 
-                        <a href="${url}" download="products.json" style="color: #00ffff; text-decoration: underline;">
-                            <i class="fas fa-download"></i> products.json
-                        </a>
-                    </li>
-                    <li>Замените файл <code>products.json</code> в корне сайта</li>
-                    <li>Обновите страницу магазина (Ctrl+F5)</li>
-                </ol>
-                <p style="margin-top: 15px; color: #00ff00;">
-                    <i class="fas fa-info-circle"></i> Товаров: <strong>${allProducts.length}</strong><br>
-                    Категорий: <strong>${data.categories.length}</strong><br>
-                    Дата: ${data.last_update}
-                </p>
-                <p style="color: #ff9900; margin-top: 10px; font-size: 0.9rem;">
-                    <i class="fas fa-lightbulb"></i> Данные уже сохранены в браузере и должны отображаться на сайте!
-                </p>
-            </div>
-        `;
-        
-        // Автоматически очистим ссылку через минуту
         setTimeout(() => {
             URL.revokeObjectURL(url);
         }, 60000);
@@ -1613,7 +1573,6 @@ function updateDataSize() {
 function changePassword() {
     const newPassword = prompt('Введите новый пароль:');
     if (newPassword && newPassword.length >= 6) {
-        // В реальном проекте здесь должен быть запрос к серверу
         alert('Пароль изменен. Для применения изменений нужно обновить файл admin.js');
         alert(`Новый пароль: ${newPassword}\n\nЗамените строку в admin.js:\npassword: "${CONFIG.password}"\nна:\npassword: "${newPassword}"`);
     } else if (newPassword) {
