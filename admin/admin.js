@@ -1,4 +1,4 @@
-     // ===== АДМИН-ПАНЕЛЬ IGLOV SHOP =====
+// ===== АДМИН-ПАНЕЛЬ IGLOV SHOP =====
 // Конфигурация
 const CONFIG = {
     password: "maybelaterfuck", // ПАРОЛЬ ИЗМЕНЁН!
@@ -166,7 +166,6 @@ function showAdminPanel() {
 function logout() {
     if (confirm('Выйти из админ-панели?')) {
         localStorage.removeItem('admin_authenticated');
-        
         clearInterval(sessionTimer);
         location.reload();
     }
@@ -284,13 +283,6 @@ function saveToStorage() {
     localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
     
     // Автоматически обновляем сайт при каждом сохранении
-    autoUpdateWebsite();
-    
-    updateUI();
-    console.log(`[SAVE] Сохранено ${allProducts.length} товаров`);
-}
-    
-    // Автоматически обновляем сайт
     autoUpdateWebsite();
     
     updateUI();
@@ -1222,6 +1214,7 @@ function updateWebsite() {
         }
     }
 }
+
 // Обновление вкладки бэкапа
 function updateBackupTab() {
     const container = document.getElementById('tab-backup');
