@@ -3,223 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IGLOV SHOP — Номера & NFT</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Админ-панель IGLOV SHOP</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Сканирующая линия (киберпанк эффект) - увеличен интервал -->
-    <div class="scan-line"></div>
-    
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
-    <div class="terminal-container">
-        <!-- Экран 1: Главный -->
-        <section id="screen-1" class="screen active">
-            <div class="terminal-header">
-                <div class="prompt">root@iglova:~$</div>
-                <div class="status">
-                    <span class="status-indicator active"></span>
-                    <span class="status-text">СИСТЕМА АКТИВНА</span>
-                </div>
+    <!-- Экран ввода пароля -->
+    <div id="password-screen" class="password-screen">
+        <div class="admin-container">
+            <h1><i class="fas fa-lock"></i> АДМИН-ПАНЕЛЬ IGLOV SHOP</h1>
+            <p class="cyber-text">Введите пароль для доступа:</p>
+            <div class="form-group password-input">
+                <input type="password" id="admin-password" placeholder="Введите пароль" class="cyber-input">
+                <p class="help-text">Пароль предоставляет продавец</p>
             </div>
-            
-            <div class="content">
-                <div class="shop-title-container">
-                    <div class="shop-title-main">IGLOV</div>
-                    <div class="shop-title-sub">SHOP</div>
-                </div>
-                
-                <div class="ascii-art">
-                    <pre class="ascii-large">
-  ▄█     █▄     ▄████████    ▄████████    ▄████████    ▄████████ 
-  ███     ███   ███    ███   ███    ███   ███    ███   ███    ███ 
-  ███     ███   ███    █▀    ███    ███   ███    █▀    ███    █▀  
-  ███     ███   ███         ▄███▄▄▄▄██▀  ▄███▄▄▄       ███        
-  ███     ███ ▀███████████ ▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ▀███████████ 
-  ███     ███          ███ ▀███████████   ███    █▄           ███ 
-  ███ ▄█▄ ███    ▄█    ███   ███    ███   ███    ███    ▄█    ███ 
-   ▀███▀███▀   ▄████████▀    ███    ███   ██████████  ▄████████▀  
-                             ███    ███                         
-                    </pre>
-                </div>
-                
-                <div class="shop-description cyber-border">
-                    <div class="info-line">
-                        <span class="info-prefix">>_</span>
-                        <span class="info-text">Продажа виртуальных и физических номеров</span>
-                    </div>
-                    <div class="info-line">
-                        <span class="info-prefix">>_</span>
-                        <span class="info-text">NFT аккаунты и цифровые активы</span>
-                    </div>
-                    <div class="info-line">
-                        <span class="info-prefix">>_</span>
-                        <span class="info-text">Гарантия качества • Быстрая доставка</span>
-                    </div>
-                    <div class="info-line">
-                        <span class="info-prefix">$</span>
-                        <span class="info-text">Владелец: <a href="https://t.me/useriglov" target="_blank" class="cyber-link">@useriglov</a></span>
-                    </div>
-                </div>
-                
-                <div class="menu-grid">
-                    <button class="cyber-btn terminal-flicker" data-target="screen-2">
-                        <span class="btn-number">[1]</span>
-                        <span class="btn-text">ПРОСМОТР ТОВАРОВ</span>
-                        <span class="btn-cursor">_</span>
-                    </button>
-                    
-                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn link-btn terminal-flicker">
-                        <span class="btn-number">[2]</span>
-                        <span class="btn-text">СВЯЗЬ С ВЛАДЕЛЬЦЕМ</span>
-                        <span class="btn-external"><i class="fab fa-telegram"></i></span>
-                    </a>
-                </div>
-                
-                <div class="terminal-footer">
-                    <div class="command-line cyber-border">
-                        <span class="prompt">customer@shop:~$</span>
-                        <span class="typing-text" id="typing-text"></span>
-                        <span class="cursor">█</span>
-                    </div>
-                    <div class="screen-indicator">
-                        <span class="indicator-dot active"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                    </div>
-                </div>
+            <button class="cyber-btn" onclick="checkPassword()">
+                <span class="btn-number">[>]</span>
+                <span>ВОЙТИ В СИСТЕМУ</span>
+            </button>
+            <div id="password-error" class="status error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i> Неверный пароль
             </div>
-        </section>
-
-        <!-- Экран 2: Товары -->
-        <section id="screen-2" class="screen">
-            <div class="terminal-header">
-                <button class="back-btn" data-target="screen-1">
-                    <i class="fas fa-arrow-left"></i> НАЗАД
-                </button>
-                <div class="prompt">root@iglova:~/products$</div>
-                <div class="last-update" id="last-update">Загрузка времени...</div>
-            </div>
-            
-            <div class="content">
-                <h2 class="screen-title">
-                    <span class="command-prefix">>>></span> КАТАЛОГ ТОВАРОВ
-                </h2>
-                
-                <!-- Фильтры категорий -->
-                <div class="category-filter cyber-border">
-                    <button class="category-btn active" data-category="all">[ALL] ВСЕ ТОВАРЫ</button>
-                    <button class="category-btn" data-category="russian">[RU] НОМЕРА РФ</button>
-                    <button class="category-btn" data-category="foreign">[INT] ЗАРУБЕЖНЫЕ</button>
-                    <button class="category-btn" data-category="nft_users">[NFT] NFT ЮЗЕРЫ</button>
-                    <button class="category-btn" data-category="nft_gifts">[GIFT] NFT ПОДАРКИ</button>
-                </div>
-                
-                <!-- Кнопка принудительного обновления -->
-                <div class="update-notice">
-                    <button id="force-refresh" class="cyber-btn small">
-                        <span class="btn-number">[↻]</span>
-                        <span class="btn-text">ОБНОВИТЬ БАЗУ ТОВАРОВ</span>
-                    </button>
-                    <div class="update-status" id="update-status"></div>
-                </div>
-                
-                <!-- Контейнер для товаров -->
-                <div class="products-container" id="products-container">
-                    <div class="loading-products">
-                        <div class="loading-spinner"></div>
-                        <p>ИНИЦИАЛИЗАЦИЯ БАЗЫ ТОВАРОВ...</p>
-                        <p class="loading-subtext">Подключение к хранилищу данных...</p>
-                    </div>
-                </div>
-                
-                <!-- Инфо -->
-                <div class="shop-info cyber-border">
-                    <div class="info-line">
-                        <span class="info-prefix">$</span>
-                        <span class="info-text">Для покупки: <a href="https://t.me/useriglov" target="_blank" class="cyber-link">@useriglov</a></span>
-                    </div>
-                    <div class="info-line">
-                        <span class="info-prefix">$</span>
-                        <span class="info-text">Цены указаны за единицу товара</span>
-                    </div>
-                    <div class="info-line">
-                        <span class="info-prefix">!</span>
-                        <span class="info-text">Тикеты: <a href="https://t.me/fuckiglov" target="_blank" class="cyber-link">@fuckiglov</a> 💷 33 изме</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Экран 3: Контакты -->
-        <section id="screen-3" class="screen">
-            <div class="terminal-header">
-                <button class="back-btn" data-target="screen-1">
-                    <i class="fas fa-arrow-left"></i> НАЗАД
-                </button>
-                <div class="prompt">root@iglova:~/contacts$</div>
-            </div>
-            
-            <div class="content">
-                <h2 class="screen-title">
-                    <span class="command-prefix">>>></span> КОНТАКТЫ И ПОКУПКА
-                </h2>
-                
-                <div class="contacts-container">
-                    <div class="contact-method cyber-border">
-                        <div class="method-icon"><i class="fab fa-telegram"></i></div>
-                        <div class="method-info">
-                            <h4>ВЛАДЕЛЕЦ МАГАЗИНА</h4>
-                            <a href="https://t.me/useriglov" target="_blank" class="method-link cyber-link">@useriglov</a>
-                            <p class="method-desc">Основной канал связи</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-method cyber-border">
-                        <div class="method-icon"><i class="fas fa-shopping-cart"></i></div>
-                        <div class="method-info">
-                            <h4>ПРОЦЕСС ПОКУПКИ</h4>
-                            <ol class="purchase-steps">
-                                <li>Выберите товар</li>
-                                <li>Напишите в Telegram</li>
-                                <li>Получите инструкции по оплате</li>
-                                <li>Получите товар</li>
-                            </ol>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-method cyber-border">
-                        <div class="method-icon"><i class="fas fa-headset"></i></div>
-                        <div class="method-info">
-                            <h4>ТЕХНИЧЕСКАЯ ПОДДЕРЖКА</h4>
-                            <a href="https://t.me/fuckiglov" target="_blank" class="method-link cyber-link">@fuckiglov</a>
-                            <p class="method-desc">Тикеты и вопросы</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons center-buttons">
-                    <a href="https://t.me/useriglov" target="_blank" class="cyber-btn primary terminal-flicker">
-                        <span class="btn-number">[!]</span>
-                        <span>ЭКСТРЕННАЯ СВЯЗЬ В TELEGRAM</span>
-                        <span class="btn-external"><i class="fab fa-telegram"></i></span>
-                    </a>
-                </div>
-                
-                <div class="warning-notice cyber-border">
-                    <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="warning-text">
-                        <strong>ВНИМАНИЕ:</strong> Все сделки проводятся через Telegram. Не доверяйте поддельным аккаунтам.
-                        Проверяйте username: <span class="cyber-link">@useriglov</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Основная админ-панель (скрыта до ввода пароля) -->
+    <div id="admin-panel" class="admin-container" style="display: none;">
+        <h1><i class="fas fa-cogs"></i> АДМИН-ПАНЕЛЬ IGLOV SHOP</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('products')">
+                <i class="fas fa-box"></i> ТОВАРЫ
+            </button>
+            <button class="tab-btn" onclick="switchTab('add')">
+                <i class="fas fa-plus"></i> ДОБАВИТЬ ТОВАР
+            </button>
+            <button class="tab-btn" onclick="switchTab('categories')">
+                <i class="fas fa-folder"></i> КАТЕГОРИИ
+            </button>
+            <button class="tab-btn" onclick="switchTab('export')">
+                <i class="fas fa-download"></i> ЭКСПОРТ
+            </button>
+        </div>
+
+        <!-- Вкладка: Список товаров -->
+        <div id="tab-products" class="tab-content active">
+            <h2><i class="fas fa-list"></i> Список товаров</h2>
+            <div class="form-group">
+                <input type="text" id="search-products" placeholder="🔍 Поиск по номеру или описанию..." 
+                       class="cyber-input" onkeyup="filterProducts()">
+            </div>
+            <div class="cyber-border" style="overflow-x: auto;">
+                <table class="products-table" id="products-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Номер</th>
+                            <th>Цена</th>
+                            <th>Категория</th>
+                            <th>Отлет</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list">
+                        <!-- Товары загружаются динамически -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="products-count" class="info-text" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Вкладка: Добавить товар -->
+        <div id="tab-add" class="tab-content">
+            <h2><i class="fas fa-plus-circle"></i> Добавить новый товар</h2>
+            <form id="add-product-form" class="cyber-form">
+                <div class="form-group">
+                    <label for="product-number"><i class="fas fa-phone"></i> Номер телефона:</label>
+                    <input type="text" id="product-number" required class="cyber-input"
+                           placeholder="+79211234567">
+                    <p class="help-text">Формат: +7XXXXXXXXXX или название NFT</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-price"><i class="fas fa-tag"></i> Цена (₽):</label>
+                    <input type="text" id="product-price" required class="cyber-input"
+                           placeholder="150">
+                    <p class="help-text">Только цифры, в конце добавится " ₽"</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-months"><i class="fas fa-calendar-alt"></i> Срок отлета:</label>
+                    <select id="product-months" class="cyber-input">
+                        <option value="?">Неизвестно</option>
+                        <option value="1">1 месяц</option>
+                        <option value="3">3 месяца</option>
+                        <option value="6">6 месяцев (🔥)</option>
+                        <option value="9">9 месяцев (🔥)</option>
+                        <option value="12">12 месяцев (🔥)</option>
+                        <option value="permanent">Постоянный</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-operator"><i class="fas fa-sim-card"></i> Оператор:</label>
+                    <select id="product-operator" class="cyber-input">
+                        <option value="">Не указано</option>
+                        <option value="МТС">МТС</option>
+                        <option value="Мегафон">Мегафон</option>
+                        <option value="Билайн">Билайн</option>
+                        <option value="Теле2">Теле2</option>
+                        <option value="Yota">Yota</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="Другой">Другой</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-category"><i class="fas fa-folder"></i> Категория:</label>
+                    <select id="product-category" required class="cyber-input">
+                        <option value="russian">🇷🇺 НОМЕРА РФ</option>
+                        <option value="foreign">🌍 ЗАРУБЕЖНЫЕ</option>
+                        <option value="nft_users">🎨 NFT ЮЗЕРЫ</option>
+                        <option value="nft_gifts">🎁 NFT ПОДАРКИ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-description"><i class="fas fa-align-left"></i> Описание:</label>
+                    <textarea id="product-description" rows="3" class="cyber-input"
+                              placeholder="Отлетает через 9 месяцев, гарантия... (необязательно)"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="cyber-btn primary">
+                        <span class="btn-number">[💾]</span>
+                        <span>СОХРАНИТЬ ТОВАР</span>
+                    </button>
+                    <button type="button" class="cyber-btn" onclick="resetForm()">
+                        <span class="btn-number">[🗑️]</span>
+                        <span>ОЧИСТИТЬ ФОРМУ</span>
+                    </button>
+                </div>
+            </form>
+            <div id="add-status" class="status"></div>
+        </div>
+
+        <!-- Вкладка: Управление категориями -->
+        <div id="tab-categories" class="tab-content">
+            <h2><i class="fas fa-folder-open"></i> Управление категориями</h2>
+            <div class="form-group">
+                <label>Текущие категории:</label>
+                <div id="categories-list" class="categories-grid"></div>
+            </div>
+            
+            <h3><i class="fas fa-plus-square"></i> Добавить новую категорию</h3>
+            <form class="cyber-form">
+                <div class="form-group">
+                    <label for="new-category-name">Название категории:</label>
+                    <input type="text" id="new-category-name" class="cyber-input" 
+                           placeholder="Например: Премиум номера">
+                </div>
+                <div class="form-group">
+                    <label for="new-category-icon">Иконка (эмодзи):</label>
+                    <input type="text" id="new-category-icon" class="cyber-input" 
+                           placeholder="⭐">
+                </div>
+                <div class="form-group">
+                    <label for="new-category-id">ID категории:</label>
+                    <input type="text" id="new-category-id" class="cyber-input" 
+                           placeholder="premium">
+                    <p class="help-text">Только английские буквы, без пробелов (например: premium_numbers)</p>
+                </div>
+                <button type="button" class="cyber-btn primary" onclick="addCategory()">
+                    <span class="btn-number">[➕]</span>
+                    <span>ДОБАВИТЬ КАТЕГОРИЮ</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Вкладка: Экспорт и обновление -->
+        <div id="tab-export" class="tab-content">
+            <h2><i class="fas fa-database"></i> Экспорт и обновление</h2>
+            
+            <div class="info-panel cyber-border">
+                <h3><i class="fas fa-info-circle"></i> Статус данных</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Текущий статус:</span>
+                        <span class="info-value" id="data-status">Загрузка...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Всего товаров:</span>
+                        <span class="info-value" id="total-products">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Последнее обновление:</span>
+                        <span class="info-value" id="last-update-admin">Неизвестно</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-panel cyber-border">
+                <h3><i class="fas fa-download"></i> Экспорт данных</h3>
+                <div class="action-grid">
+                    <button class="cyber-btn" onclick="exportToJSON()">
+                        <span class="btn-number">[📥]</span>
+                        <span>Экспорт в JSON</span>
+                    </button>
+                    <button class="cyber-btn" onclick="exportToCSV()">
+                        <span class="btn-number">[📊]</span>
+                        <span>Экспорт в CSV</span>
+                    </button>
+                    <button class="cyber-btn" onclick="copyToClipboard()">
+                        <span class="btn-number">[📋]</span>
+                        <span>Копировать JSON</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="action-panel cyber-border">
+                <h3><i class="fas fa-upload"></i> Импорт данных</h3>
+                <input type="file" id="import-file" accept=".json,.csv" style="display: none;">
+                <button class="cyber-btn" onclick="document.getElementById('import-file').click()">
+                    <span class="btn-number">[📤]</span>
+                    <span>Импорт из файла</span>
+                </button>
+                <p class="help-text">Поддерживаются JSON и CSV форматы</p>
+            </div>
+            
+            <div class="action-panel cyber-border">
+                <h3><i class="fas fa-sync-alt"></i> Обновление сайта</h3>
+                <button class="cyber-btn primary" onclick="updateWebsite()">
+                    <span class="btn-number">[🔄]</span>
+                    <span>ОБНОВИТЬ САЙТ</span>
+                </button>
+                <p class="help-text">Отправляет обновленные данные на сайт</p>
+                <div id="update-status" class="status"></div>
+            </div>
+            
+            <div class="action-panel cyber-border">
+                <h3><i class="fas fa-hdd"></i> Резервное копирование</h3>
+                <div class="action-grid">
+                    <button class="cyber-btn" onclick="createBackup()">
+                        <span class="btn-number">[💾]</span>
+                        <span>Создать бэкап</span>
+                    </button>
+                    <button class="cyber-btn" onclick="restoreBackup()">
+                        <span class="btn-number">[🔄]</span>
+                        <span>Восстановить</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-footer cyber-border">
+            <div class="footer-info">
+                <span><i class="fas fa-user-shield"></i> Администратор: @useriglov</span>
+                <span><i class="fas fa-clock"></i> Сессия: <span id="session-time">00:00</span></span>
+                <button class="cyber-btn small" onclick="logout()">
+                    <span class="btn-number">[🚪]</span>
+                    <span>Выйти</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
 </body>
 </html>
