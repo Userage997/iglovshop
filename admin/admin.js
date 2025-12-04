@@ -22,6 +22,14 @@ let sessionTimer = null;
 let currentEditingIndex = -1;
 let isPasswordVisible = false;
 
+// Синхронизация между вкладками
+let syncChannel;
+try {
+    syncChannel = new BroadcastChannel('iglova_shop_sync');
+} catch (e) {
+    console.log('[SYNC] BroadcastChannel не поддерживается');
+}
+
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     console.log(`[ADMIN] IGLOV SHOP Admin v${CONFIG.version} initialized`);
@@ -282,11 +290,33 @@ function saveToStorage() {
     
     localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
     
-    // Автоматически обновляем сайт при каждом сохранении
+    // Автоматически обновляем сайт
     autoUpdateWebsite();
+    
+    // Синхронизируем с другими вкладками
+    syncWithOtherTabs();
     
     updateUI();
     console.log(`[SAVE] Сохранено ${allProducts.length} товаров`);
+}
+
+// Синхронизация между вкладками
+function syncWithOtherTabs() {
+    try {
+        if (!syncChannel) return;
+        
+        const data = prepareDataForExport();
+        
+        syncChannel.postMessage({
+            type: 'data_updated',
+            data: data,
+            timestamp: new Date().toISOString()
+        });
+        
+        console.log('[SYNC] Данные отправлены другим вкладкам');
+    } catch (e) {
+        console.warn('[SYNC] Ошибка синхронизации');
+    }
 }
 
 // Автоматическое обновление сайта (без скачивания файла)
