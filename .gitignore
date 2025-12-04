@@ -1,5 +1,32 @@
-# Создайте файл .gitignore в корне
-admin/config.js
+# Конфигурационные файлы
+config.js
 .env
+.env.local
+.env.production
+
+# Логи
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Временные файлы
+.DS_Store
+*.tmp
+*.temp
+
+# Зависимости
 node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Системные файлы
+Thumbs.db
+
+# Резервные копии
+*.bak
+*.backup
