@@ -11,7 +11,7 @@ const SHOP_CONFIG = {
     },
     productsUrl: 'products.json',
     cacheTime: 5 * 60 * 1000, // 5 минут кэш
-    version: "1.0.0"
+    version: "1.2.0" // Обновили версию
 };
 
 // Тексты для печатающего эффекта
@@ -35,7 +35,10 @@ let currentCategory = 'all';
 document.addEventListener('DOMContentLoaded', function() {
     console.log(`[${SHOP_CONFIG.name}] v${SHOP_CONFIG.version} initialized`);
     
-    // Инициализация эффектов
+    // Инициализация эпичных эффектов
+    initParticles();
+    initStars();
+    initMatrixRain();
     initTypingEffect();
     initCyberpunkEffects();
     
@@ -56,7 +59,199 @@ document.addEventListener('DOMContentLoaded', function() {
             loadProducts(true); // silent mode
         }
     }, SHOP_CONFIG.cacheTime);
+    
+    // Добавляем эффект при наведении на кнопки
+    initButtonEffects();
+    
+    // Добавляем эффект при клике
+    initClickEffects();
 });
+
+// ===== ЭПИЧНЫЕ ЭФФЕКТЫ =====
+
+// Создание частиц
+function initParticles() {
+    const particlesContainer = document.createElement('div');
+    particlesContainer.className = 'particles';
+    document.body.appendChild(particlesContainer);
+    
+    // Создаем частицы
+    for (let i = 0; i < 50; i++) {
+        createParticle(particlesContainer);
+    }
+    
+    // Периодически добавляем новые частицы
+    setInterval(() => {
+        if (document.querySelectorAll('.particle').length < 50) {
+            createParticle(particlesContainer);
+        }
+    }, 1000);
+}
+
+function createParticle(container) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    
+    // Случайные параметры
+    const size = Math.random() * 4 + 1;
+    const posX = Math.random() * 100;
+    const duration = Math.random() * 10 + 10;
+    const delay = Math.random() * 5;
+    
+    // Случайный цвет
+    const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    // Устанавливаем стили
+    particle.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${posX}%;
+        top: 100vh;
+        background: ${color};
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+        opacity: ${Math.random() * 0.2 + 0.05};
+        box-shadow: 0 0 ${size * 2}px ${color};
+    `;
+    
+    container.appendChild(particle);
+    
+    // Удаляем частицу после анимации
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.remove();
+        }
+    }, duration * 1000);
+}
+
+// Создание звёзд
+function initStars() {
+    const starsContainer = document.createElement('div');
+    starsContainer.className = 'stars';
+    document.body.appendChild(starsContainer);
+    
+    // Создаем звёзды
+    for (let i = 0; i < 100; i++) {
+        createStar(starsContainer);
+    }
+}
+
+function createStar(container) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    
+    // Случайные параметры
+    const size = Math.random() * 3;
+    const posX = Math.random() * 100;
+    const posY = Math.random() * 100;
+    const duration = Math.random() * 5 + 2;
+    const delay = Math.random() * 5;
+    
+    // Устанавливаем стили
+    star.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${posX}%;
+        top: ${posY}%;
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+        opacity: ${Math.random() * 0.3 + 0.1};
+    `;
+    
+    container.appendChild(star);
+}
+
+// Матричный дождь
+function initMatrixRain() {
+    const matrixContainer = document.createElement('div');
+    matrixContainer.className = 'matrix-rain';
+    document.body.appendChild(matrixContainer);
+    
+    // Периодически создаем символы матрицы
+    setInterval(() => {
+        if (Math.random() > 0.7) { // 30% chance
+            createMatrixChar(matrixContainer);
+        }
+    }, 100);
+}
+
+function createMatrixChar(container) {
+    const char = document.createElement('div');
+    char.className = 'matrix-char';
+    char.textContent = String.fromCharCode(0x30A0 + Math.random() * 96);
+    
+    // Случайные параметры
+    const posX = Math.random() * 100;
+    const duration = Math.random() * 5 + 3;
+    const fontSize = Math.random() * 10 + 10;
+    
+    // Устанавливаем стили
+    char.style.cssText = `
+        left: ${posX}%;
+        font-size: ${fontSize}px;
+        animation-duration: ${duration}s;
+        opacity: ${Math.random() * 0.2 + 0.05};
+    `;
+    
+    container.appendChild(char);
+    
+    // Удаляем символ после анимации
+    setTimeout(() => {
+        if (char.parentNode) {
+            char.remove();
+        }
+    }, duration * 1000);
+}
+
+// Эффекты для кнопок
+function initButtonEffects() {
+    document.querySelectorAll('.cyber-btn').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.classList.add('flash');
+            setTimeout(() => this.classList.remove('flash'), 500);
+        });
+        
+        button.addEventListener('click', function() {
+            this.classList.add('vibrate');
+            setTimeout(() => this.classList.remove('vibrate'), 300);
+        });
+    });
+}
+
+// Эффекты при клике
+function initClickEffects() {
+    document.addEventListener('click', function(e) {
+        // Создаем эффект вспышки
+        const flash = document.createElement('div');
+        flash.style.cssText = `
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,0,0.3) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 99999;
+            left: ${e.clientX - 50}px;
+            top: ${e.clientY - 50}px;
+            animation: clickFlash 0.5s ease-out forwards;
+        `;
+        
+        document.body.appendChild(flash);
+        
+        setTimeout(() => flash.remove(), 500);
+    });
+}
+
+// Добавляем стиль для эффекта клика
+const clickStyle = document.createElement('style');
+clickStyle.textContent = `
+    @keyframes clickFlash {
+        0% { transform: scale(0); opacity: 1; }
+        100% { transform: scale(3); opacity: 0; }
+    }
+`;
+document.head.appendChild(clickStyle);
 
 // Печатающий текст в футере
 function initTypingEffect() {
@@ -81,6 +276,14 @@ function initTypingEffect() {
             typingSpeed = 100;
         }
         
+        // Эффект глитча
+        if (Math.random() > 0.9) {
+            typingElement.style.textShadow = '0 0 10px #ff00ff';
+            setTimeout(() => {
+                typingElement.style.textShadow = '0 0 5px #ffffff';
+            }, 50);
+        }
+        
         if (!isDeleting && charIndex === currentText.length) {
             isDeleting = true;
             typingSpeed = 1500;
@@ -96,7 +299,7 @@ function initTypingEffect() {
     setTimeout(type, 1000);
 }
 
-// Киберпанк эффекты
+// Киберпанк эффекты с улучшениями
 function initCyberpunkEffects() {
     // Динамическое мерцание ASCII
     setInterval(() => {
@@ -104,6 +307,14 @@ function initCyberpunkEffects() {
         if (ascii) {
             const intensity = 0.5 + Math.random() * 0.5;
             ascii.style.textShadow = `0 0 ${15 + Math.random() * 15}px rgba(0, 255, 255, ${intensity})`;
+            
+            // Случайный эффект глитча
+            if (Math.random() > 0.95) {
+                ascii.style.filter = 'hue-rotate(180deg)';
+                setTimeout(() => {
+                    ascii.style.filter = '';
+                }, 100);
+            }
         }
     }, 2000);
     
@@ -112,6 +323,15 @@ function initCyberpunkEffects() {
     if (statusIndicator) {
         setInterval(() => {
             statusIndicator.style.opacity = statusIndicator.style.opacity === '0.5' ? '1' : '0.5';
+            
+            // Случайное изменение цвета
+            if (Math.random() > 0.9) {
+                const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00'];
+                statusIndicator.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                setTimeout(() => {
+                    statusIndicator.style.backgroundColor = '';
+                }, 500);
+            }
         }, 1500);
     }
     
@@ -123,27 +343,71 @@ function initCyberpunkEffects() {
                 el.style.transition = 'opacity 0.5s ease';
                 setTimeout(() => {
                     el.style.opacity = '1';
+                    el.classList.add('flash');
+                    setTimeout(() => el.classList.remove('flash'), 500);
                 }, 100);
             }, index * 200);
         });
     }, 1000);
     
-    // Мерцание промптов
+    // Мерцание промптов с эффектами
     setInterval(() => {
         document.querySelectorAll('.prompt').forEach(prompt => {
-            prompt.style.textShadow = prompt.style.textShadow 
-                ? '' 
-                : '0 0 10px #00ffff, 0 0 20px #00ffff';
+            if (Math.random() > 0.7) {
+                prompt.style.textShadow = prompt.style.textShadow 
+                    ? '' 
+                    : '0 0 10px #00ffff, 0 0 20px #00ffff';
+                    
+                // Случайный цвет
+                if (Math.random() > 0.8) {
+                    const colors = ['#00ffff', '#ff00ff', '#ffff00'];
+                    prompt.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    setTimeout(() => {
+                        prompt.style.color = '';
+                    }, 300);
+                }
+            }
+        });
+    }, 3000);
+    
+    // Эффект для заголовка магазина
+    const shopTitle = document.querySelector('.shop-title-main');
+    if (shopTitle) {
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                shopTitle.classList.add('glitch');
+                shopTitle.setAttribute('data-text', shopTitle.textContent);
+                setTimeout(() => {
+                    shopTitle.classList.remove('glitch');
+                }, 500);
+            }
+        }, 5000);
+    }
+    
+    // Эффект сканирования для границ
+    setInterval(() => {
+        document.querySelectorAll('.cyber-border').forEach((border, index) => {
+            if (Math.random() > 0.8) {
+                border.classList.add('energy-shield');
+                setTimeout(() => {
+                    border.classList.remove('energy-shield');
+                }, 1000);
+            }
         });
     }, 3000);
 }
 
-// Навигация между экранами
+// Навигация между экранами с эффектами
 function initNavigation() {
     // Основные кнопки навигации
     document.querySelectorAll('.cyber-btn[data-target]').forEach(button => {
         button.addEventListener('click', function() {
             const targetScreenId = this.getAttribute('data-target');
+            
+            // Эффект телепортации
+            this.classList.add('teleport');
+            setTimeout(() => this.classList.remove('teleport'), 500);
+            
             switchScreen(targetScreenId);
         });
     });
@@ -152,6 +416,11 @@ function initNavigation() {
     document.querySelectorAll('.back-btn').forEach(button => {
         button.addEventListener('click', function() {
             const targetScreenId = this.getAttribute('data-target');
+            
+            // Эффект
+            this.classList.add('system-reboot');
+            setTimeout(() => this.classList.remove('system-reboot'), 2000);
+            
             switchScreen(targetScreenId);
         });
     });
@@ -170,11 +439,17 @@ function handleHashChange() {
     }
 }
 
-// Переключение экранов
+// Переключение экранов с эпичными эффектами
 function switchScreen(screenId) {
     // Если нажали админку - открываем в новой вкладке
     if (screenId === 'admin') {
-        window.open('admin/admin.html', '_blank');
+        // Эффект перед открытием
+        document.querySelector('.terminal-container').classList.add('blur-transition');
+        
+        setTimeout(() => {
+            window.open('admin/admin.html', '_blank');
+            document.querySelector('.terminal-container').classList.remove('blur-transition');
+        }, 300);
         return;
     }
     
@@ -183,11 +458,13 @@ function switchScreen(screenId) {
     
     const activeScreen = document.querySelector('.screen.active');
     
-    // Анимация перехода
+    // Эффект перехода
     if (activeScreen) {
+        activeScreen.classList.add('blur-transition');
         activeScreen.classList.remove('active');
+        
         setTimeout(() => {
-            targetScreen.classList.add('active');
+            targetScreen.classList.add('active', 'blur-transition');
             updateIndicator(screenId);
             
             // Действия при переходе на конкретный экран
@@ -199,14 +476,28 @@ function switchScreen(screenId) {
             } else {
                 updateHash('');
             }
+            
+            // Убираем эффект размытия
+            setTimeout(() => {
+                targetScreen.classList.remove('blur-transition');
+            }, 300);
         }, 300);
     } else {
         targetScreen.classList.add('active');
         updateIndicator(screenId);
     }
     
-    // Плавный скролл наверх
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Плавный скролл наверх с эффектом
+    window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth' 
+    });
+    
+    // Эффект перезагрузки системы
+    document.querySelector('.terminal-container').classList.add('system-reboot');
+    setTimeout(() => {
+        document.querySelector('.terminal-container').classList.remove('system-reboot');
+    }, 2000);
 }
 
 function updateHash(hash) {
@@ -217,37 +508,53 @@ function updateHash(hash) {
     }
 }
 
-// Обновление индикатора экрана
+// Обновление индикатора экрана с анимацией
 function updateIndicator(screenId) {
     const screenNumber = parseInt(screenId.split('-')[1]);
     document.querySelectorAll('.indicator-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === screenNumber - 1);
+        if (index === screenNumber - 1) {
+            dot.classList.add('active');
+            dot.classList.add('flash');
+            setTimeout(() => dot.classList.remove('flash'), 500);
+        } else {
+            dot.classList.remove('active');
+        }
     });
 }
 
-// Фильтр категорий
+// Фильтр категорий с эффектами
 function initCategoryFilter() {
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             currentCategory = this.getAttribute('data-category');
             
+            // Эффект для активной кнопки
+            this.classList.add('teleport');
+            setTimeout(() => this.classList.remove('teleport'), 500);
+            
             // Обновляем активную кнопку
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-            // Фильтруем товары
-            filterProductsByCategory(currentCategory);
+            // Фильтруем товары с эффектом
+            document.querySelector('.products-grid').classList.add('system-reboot');
+            setTimeout(() => {
+                filterProductsByCategory(currentCategory);
+                document.querySelector('.products-grid').classList.remove('system-reboot');
+            }, 500);
         });
     });
 }
 
-// Принудительное обновление
+// Принудительное обновление с эффектами
 function initForceRefresh() {
     const refreshBtn = document.getElementById('force-refresh');
     if (!refreshBtn) return;
     
     refreshBtn.addEventListener('click', async () => {
+        // Эффект загрузки
         refreshBtn.innerHTML = '<span class="btn-number">[↻]</span><span class="btn-text">ОБНОВЛЕНИЕ...</span>';
+        refreshBtn.classList.add('energy-shield');
         refreshBtn.disabled = true;
         
         // Сбрасываем кэш
@@ -256,23 +563,27 @@ function initForceRefresh() {
         try {
             await loadProducts();
             
-            // Успешное обновление
+            // Успешное обновление с эффектом
             showUpdateStatus('✅ База товаров обновлена', 'success');
             refreshBtn.innerHTML = '<span class="btn-number">[✓]</span><span class="btn-text">ОБНОВЛЕНО</span>';
+            refreshBtn.classList.add('flash');
             
             setTimeout(() => {
                 refreshBtn.innerHTML = '<span class="btn-number">[↻]</span><span class="btn-text">ОБНОВИТЬ БАЗУ ТОВАРОВ</span>';
                 refreshBtn.disabled = false;
+                refreshBtn.classList.remove('flash', 'energy-shield');
             }, 2000);
             
         } catch (error) {
-            // Ошибка обновления
+            // Ошибка обновления с эффектом
             showUpdateStatus('❌ Ошибка обновления', 'error');
             refreshBtn.innerHTML = '<span class="btn-number">[✗]</span><span class="btn-text">ОШИБКА</span>';
+            refreshBtn.classList.add('vibrate');
             
             setTimeout(() => {
                 refreshBtn.innerHTML = '<span class="btn-number">[↻]</span><span class="btn-text">ОБНОВИТЬ БАЗУ ТОВАРОВ</span>';
                 refreshBtn.disabled = false;
+                refreshBtn.classList.remove('vibrate', 'energy-shield');
             }, 3000);
         }
     });
@@ -287,33 +598,44 @@ function showUpdateStatus(message, type = 'info') {
     
     if (type === 'success') {
         statusElement.style.color = '#00ff00';
+        statusElement.classList.add('flash');
+        setTimeout(() => statusElement.classList.remove('flash'), 1000);
     } else if (type === 'error') {
         statusElement.style.color = '#ff3333';
+        statusElement.classList.add('vibrate');
+        setTimeout(() => statusElement.classList.remove('vibrate'), 1000);
     } else {
         statusElement.style.color = '#00ffff';
     }
     
     setTimeout(() => {
         statusElement.textContent = '';
+        statusElement.className = 'update-status';
     }, 5000);
 }
 
-// Загрузка товаров
+// Загрузка товаров с эффектами
 async function loadProducts(silent = false) {
     const container = document.getElementById('products-container');
     const updateElement = document.getElementById('last-update');
     
     if (!container) return;
     
-    // Показываем загрузку
+    // Показываем загрузку с эффектами
     if (!silent) {
         container.innerHTML = `
             <div class="loading-products">
                 <div class="loading-spinner"></div>
                 <p>ЗАГРУЗКА БАЗЫ ТОВАРОВ...</p>
                 <p class="loading-subtext">Подключение к хранилищу данных...</p>
+                <div class="progress-container" style="max-width: 300px; margin: 20px auto;">
+                    <div class="progress-bar"></div>
+                </div>
             </div>
         `;
+        
+        // Эффект загрузки
+        container.classList.add('data-loading');
     }
     
     try {
@@ -325,6 +647,12 @@ async function loadProducts(silent = false) {
             console.log('[CACHE] Using cached products');
             displayProducts(productsData);
             updateLastUpdate(updateElement, productsData.last_update, true);
+            
+            // Эффект кэша
+            container.classList.remove('data-loading');
+            container.classList.add('flash');
+            setTimeout(() => container.classList.remove('flash'), 500);
+            
             return;
         }
         
@@ -354,7 +682,12 @@ async function loadProducts(silent = false) {
         // Обновляем время
         updateLastUpdate(updateElement, data.last_update);
         
+        // Эффект успешной загрузки
         if (!silent) {
+            container.classList.remove('data-loading');
+            container.classList.add('teleport');
+            setTimeout(() => container.classList.remove('teleport'), 500);
+            
             console.log(`[API] Loaded ${data.categories.reduce((sum, cat) => sum + (cat.products?.length || 0), 0)} products`);
         }
         
@@ -375,11 +708,18 @@ async function loadProducts(silent = false) {
                     </div>
                 </div>
             `;
+            
+            // Эффект ошибки
+            container.classList.remove('data-loading');
+            container.classList.add('vibrate');
+            setTimeout(() => container.classList.remove('vibrate'), 1000);
         }
         
         if (updateElement) {
             updateElement.textContent = 'Ошибка загрузки';
             updateElement.style.color = '#ff3333';
+            updateElement.classList.add('vibrate');
+            setTimeout(() => updateElement.classList.remove('vibrate'), 1000);
         }
     }
 }
@@ -390,13 +730,18 @@ function updateLastUpdate(element, timestamp, cached = false) {
     if (timestamp) {
         element.textContent = `Обновлено: ${timestamp} ${cached ? '(кеш)' : ''}`;
         element.style.color = cached ? '#888' : '#00ff00';
+        
+        if (!cached) {
+            element.classList.add('flash');
+            setTimeout(() => element.classList.remove('flash'), 1000);
+        }
     } else {
         element.textContent = 'Время обновления неизвестно';
         element.style.color = '#ff9900';
     }
 }
 
-// Отображение товаров
+// Отображение товаров с анимациями
 function displayProducts(data) {
     const container = document.getElementById('products-container');
     if (!container || !data || !data.categories) return;
@@ -424,6 +769,12 @@ function displayProducts(data) {
                 <h3>ТОВАРОВ ПОКА НЕТ</h3>
                 <p>В базе данных отсутствуют товары</p>
                 <p style="color: #888;">Скоро появятся новые поступления!</p>
+                <div style="margin-top: 20px;">
+                    <button class="cyber-btn" onclick="switchScreen('screen-1')">
+                        <span class="btn-number">[←]</span>
+                        <span>ВЕРНУТЬСЯ НА ГЛАВНУЮ</span>
+                    </button>
+                </div>
             </div>
         `;
         return;
@@ -443,6 +794,13 @@ function displayProducts(data) {
         </div>
     `;
     
+    // Добавляем эффекты для карточек
+    setTimeout(() => {
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    }, 100);
+    
     // Применяем текущий фильтр
     filterProductsByCategory(currentCategory);
 }
@@ -453,10 +811,10 @@ function extractPrice(priceStr) {
     return match ? parseFloat(match[1]) : 0;
 }
 
-// Создание карточки товара
+// Создание карточки товара с эффектами
 function createProductCard(product, index) {
     const isHighlight = product.months && parseInt(product.months) >= 6;
-    const delay = index * 50;
+    const delay = index * 100;
     
     return `
         <div class="product-card ${isHighlight ? 'highlight' : ''}" 
@@ -505,7 +863,8 @@ function createProductCard(product, index) {
             <a href="${SHOP_CONFIG.owner.telegram}?text=${encodeURIComponent(getOrderMessage(product))}" 
                target="_blank" 
                class="buy-btn"
-               title="Купить через Telegram">
+               title="Купить через Telegram"
+               onclick="this.classList.add('teleport'); setTimeout(() => this.classList.remove('teleport'), 500);">
                 <i class="fab fa-telegram"></i> КУПИТЬ (Telegram)
             </a>
         </div>
@@ -535,7 +894,7 @@ function getOrderMessage(product) {
            `Готов(а) к оплате.`;
 }
 
-// Фильтрация товаров по категории
+// Фильтрация товаров по категории с эффектами
 function filterProductsByCategory(category) {
     const allCards = document.querySelectorAll('.product-card');
     let visibleCount = 0;
@@ -548,12 +907,14 @@ function filterProductsByCategory(category) {
             card.style.display = 'block';
             setTimeout(() => {
                 card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
+                card.style.transform = 'translateY(0) translateZ(0) rotateX(0)';
+                card.classList.add('flash');
+                setTimeout(() => card.classList.remove('flash'), 300);
             }, 10);
             visibleCount++;
         } else {
             card.style.opacity = '0';
-            card.style.transform = 'translateY(10px)';
+            card.style.transform = 'translateY(20px) translateZ(-20px) rotateX(10deg)';
             setTimeout(() => {
                 card.style.display = 'none';
             }, 300);
@@ -570,12 +931,15 @@ function filterProductsByCategory(category) {
                 <i class="fas fa-search"></i>
                 <h3>ТОВАРОВ НЕ НАЙДЕНО</h3>
                 <p>В категории "${getCategoryName(category)}" пока нет товаров</p>
-                <button class="cyber-btn small" onclick="document.querySelector('[data-category=\\'all\\']').click()" 
+                <button class="cyber-btn" onclick="document.querySelector('[data-category=\\'all\\']').click()" 
                         style="margin-top: 15px;">
                     <span class="btn-number">[←]</span>
                     <span>ВЕРНУТЬСЯ КО ВСЕМ ТОВАРАМ</span>
                 </button>
             `;
+            
+            // Эффект появления сообщения
+            message.classList.add('blur-transition');
             
             // Находим сетку товаров и заменяем
             const grid = container.querySelector('.products-grid');
@@ -583,6 +947,8 @@ function filterProductsByCategory(category) {
                 container.insertBefore(message, grid);
                 grid.style.display = 'none';
             }
+            
+            setTimeout(() => message.classList.remove('blur-transition'), 300);
         }
     } else {
         // Восстанавливаем отображение сетки
@@ -591,12 +957,19 @@ function filterProductsByCategory(category) {
             const grid = container.querySelector('.products-grid');
             if (grid) {
                 grid.style.display = 'grid';
+                grid.classList.add('teleport');
+                setTimeout(() => grid.classList.remove('teleport'), 500);
             }
             
             // Удаляем сообщение если есть
             const existingMessage = container.querySelector('.error-message');
             if (existingMessage && existingMessage.querySelector('.fa-search')) {
-                existingMessage.remove();
+                existingMessage.classList.add('blur-transition');
+                setTimeout(() => {
+                    if (existingMessage.parentNode) {
+                        existingMessage.remove();
+                    }
+                }, 300);
             }
         }
     }
