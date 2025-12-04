@@ -172,6 +172,12 @@ function handleHashChange() {
 
 // Переключение экранов
 function switchScreen(screenId) {
+    // Если нажали админку - открываем в новой вкладке
+    if (screenId === 'admin') {
+        window.open('admin/admin.html', '_blank');
+        return;
+    }
+    
     const targetScreen = document.getElementById(screenId);
     if (!targetScreen) return;
     
