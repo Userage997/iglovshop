@@ -11,7 +11,7 @@ const CONFIG = {
 // Глобальные переменные
 let allProducts = [];
 let categories = [
-    { id: "russian", name: "НОМЕРА РФ", icon: "🇷🇺", description: "Российские номера с гарантией отлетa" },
+    { id: "russian", name: "НОМЕРА РФ", icon: "🇷🇺", description: "Российские номера с гарантией отлета" },
     { id: "foreign", name: "ЗАРУБЕЖНЫЕ", icon: "🌍", description: "Номера других стран" },
     { id: "nft_users", name: "NFT ЮЗЕРЫ", icon: "🎨", description: "NFT аккаунты и профили" },
     { id: "nft_gifts", name: "NFT ПОДАРКИ", icon: "🎁", description: "Цифровые подарки и активы" }
@@ -54,11 +54,17 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUI();
     
     // Обработка формы добавления товара
-    document.getElementById('product-number')?.addEventListener('input', updateProductPreview);
-    document.getElementById('product-price')?.addEventListener('input', updateProductPreview);
-    document.getElementById('product-months')?.addEventListener('change', updateProductPreview);
-    document.getElementById('product-operator')?.addEventListener('change', updateProductPreview);
-    document.getElementById('product-description')?.addEventListener('input', updateProductPreview);
+    const productNumber = document.getElementById('product-number');
+    const productPrice = document.getElementById('product-price');
+    const productMonths = document.getElementById('product-months');
+    const productOperator = document.getElementById('product-operator');
+    const productDescription = document.getElementById('product-description');
+    
+    if (productNumber) productNumber.addEventListener('input', updateProductPreview);
+    if (productPrice) productPrice.addEventListener('input', updateProductPreview);
+    if (productMonths) productMonths.addEventListener('change', updateProductPreview);
+    if (productOperator) productOperator.addEventListener('change', updateProductPreview);
+    if (productDescription) productDescription.addEventListener('input', updateProductPreview);
     
     // Обновляем время каждую секунду
     setInterval(updateCurrentTime, 1000);
@@ -91,7 +97,7 @@ function togglePasswordVisibility() {
 // Проверка пароля
 function checkPassword() {
     const passwordInput = document.getElementById('admin-password');
-    const password = passwordInput.value;
+    const password = passwordInput ? passwordInput.value : '';
     const errorElement = document.getElementById('password-error');
     const loader = document.getElementById('login-loader');
     const loginBtn = document.querySelector('.login-btn');
@@ -102,8 +108,8 @@ function checkPassword() {
     }
     
     // Показываем загрузку
-    loader.style.display = 'block';
-    loginBtn.disabled = true;
+    if (loader) loader.style.display = 'block';
+    if (loginBtn) loginBtn.disabled = true;
     
     // Имитация задержки проверки
     setTimeout(() => {
@@ -114,26 +120,28 @@ function checkPassword() {
             console.log('[AUTH] Successful login');
             
             // Скрываем ошибку если была
-            errorElement.style.display = 'none';
+            if (errorElement) errorElement.style.display = 'none';
         } else {
             // Неверный пароль
             showError('Неверный пароль доступа');
             console.warn('[AUTH] Failed login attempt');
             
             // Эффект вибрации
-            passwordInput.style.animation = 'shake 0.5s';
-            setTimeout(() => {
-                passwordInput.style.animation = '';
-            }, 500);
-            
-            // Очистка поля
-            passwordInput.value = '';
-            passwordInput.focus();
+            if (passwordInput) {
+                passwordInput.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    passwordInput.style.animation = '';
+                }, 500);
+                
+                // Очистка поля
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
         }
         
         // Скрываем загрузку
-        loader.style.display = 'none';
-        loginBtn.disabled = false;
+        if (loader) loader.style.display = 'none';
+        if (loginBtn) loginBtn.disabled = false;
     }, 1000);
 }
 
@@ -155,8 +163,12 @@ function showError(message) {
 
 // Показать админ-панель
 function showAdminPanel() {
-    document.getElementById('password-screen').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
+    const passwordScreen = document.getElementById('password-screen');
+    const adminPanel = document.getElementById('admin-panel');
+    
+    if (passwordScreen) passwordScreen.style.display = 'none';
+    if (adminPanel) adminPanel.style.display = 'block';
+    
     sessionStartTime = new Date();
     startSessionTimer();
     updateCurrentTime();
@@ -174,7 +186,7 @@ function showAdminPanel() {
 function logout() {
     if (confirm('Выйти из админ-панели?')) {
         localStorage.removeItem('admin_authenticated');
-        clearInterval(sessionTimer);
+        if (sessionTimer) clearInterval(sessionTimer);
         location.reload();
     }
 }
@@ -195,8 +207,11 @@ function startSessionTimer() {
         const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
         // Обновляем все элементы с таймером
-        document.getElementById('session-timer').textContent = timeStr;
-        document.getElementById('session-time-stat').textContent = timeStr;
+        const sessionTimerEl = document.getElementById('session-timer');
+        const sessionTimeStat = document.getElementById('session-time-stat');
+        
+        if (sessionTimerEl) sessionTimerEl.textContent = timeStr;
+        if (sessionTimeStat) sessionTimeStat.textContent = timeStr;
     }, 1000);
 }
 
@@ -212,6 +227,8 @@ function updateCurrentTime() {
 
 // Переключение вкладок
 function switchTab(tabName) {
+    console.log('Переключение на вкладку:', tabName);
+    
     // Скрываем все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
@@ -229,10 +246,12 @@ function switchTab(tabName) {
     }
     
     // Активируем кнопку меню
-    const menuButton = document.querySelector(`.menu-item[onclick="switchTab('${tabName}')"]`);
-    if (menuButton) {
-        menuButton.classList.add('active');
-    }
+    const menuButtons = document.querySelectorAll('.menu-item');
+    menuButtons.forEach(button => {
+        if (button.getAttribute('onclick') === `switchTab('${tabName}')`) {
+            button.classList.add('active');
+        }
+    });
     
     // Обновляем данные если нужно
     switch(tabName) {
@@ -353,20 +372,25 @@ function updateUI() {
 // Обновление дашборда
 function updateDashboard() {
     // Общая статистика
-    document.getElementById('total-products-stat').textContent = allProducts.length;
-    document.getElementById('total-categories-stat').textContent = categories.length;
-    document.getElementById('data-counter').textContent = `${allProducts.length} товаров`;
+    const totalProductsStat = document.getElementById('total-products-stat');
+    const totalCategoriesStat = document.getElementById('total-categories-stat');
+    const dataCounter = document.getElementById('data-counter');
+    const totalValueStat = document.getElementById('total-value-stat');
+    const productsCountBadge = document.getElementById('products-count-badge');
+    const categoriesCountBadge = document.getElementById('categories-count-badge');
+    
+    if (totalProductsStat) totalProductsStat.textContent = allProducts.length;
+    if (totalCategoriesStat) totalCategoriesStat.textContent = categories.length;
+    if (dataCounter) dataCounter.textContent = `${allProducts.length} товаров`;
+    if (productsCountBadge) productsCountBadge.textContent = allProducts.length;
+    if (categoriesCountBadge) categoriesCountBadge.textContent = categories.length;
     
     // Общая стоимость
     const totalValue = allProducts.reduce((sum, product) => {
         const price = parseFloat(product.price) || 0;
         return sum + price;
     }, 0);
-    document.getElementById('total-value-stat').textContent = `${totalValue} ₽`;
-    
-    // Бейджи
-    document.getElementById('products-count-badge').textContent = allProducts.length;
-    document.getElementById('categories-count-badge').textContent = categories.length;
+    if (totalValueStat) totalValueStat.textContent = `${totalValue} ₽`;
     
     // Последние изменения
     updateRecentActivity();
@@ -514,18 +538,32 @@ function filterProducts() {
         }
     });
     
-    document.getElementById('products-table-info').textContent = 
-        `Показано ${visibleCount} товаров из ${allProducts.length}`;
+    const infoElement = document.getElementById('products-table-info');
+    if (infoElement) {
+        infoElement.textContent = `Показано ${visibleCount} товаров из ${allProducts.length}`;
+    }
 }
 
 // Добавление товара
 function addProduct() {
-    const number = document.getElementById('product-number').value.trim();
-    const price = document.getElementById('product-price').value.trim();
-    const months = document.getElementById('product-months').value;
-    const operator = document.getElementById('product-operator').value;
-    const categoryId = document.getElementById('product-category').value;
-    const description = document.getElementById('product-description').value.trim();
+    const numberInput = document.getElementById('product-number');
+    const priceInput = document.getElementById('product-price');
+    const monthsInput = document.getElementById('product-months');
+    const operatorInput = document.getElementById('product-operator');
+    const categoryInput = document.getElementById('product-category');
+    const descriptionInput = document.getElementById('product-description');
+    
+    if (!numberInput || !priceInput || !categoryInput) {
+        showFormStatus('error', '❌ Ошибка: форма не найдена');
+        return;
+    }
+    
+    const number = numberInput.value.trim();
+    const price = priceInput.value.trim();
+    const months = monthsInput ? monthsInput.value : '?';
+    const operator = operatorInput ? operatorInput.value : '';
+    const categoryId = categoryInput.value;
+    const description = descriptionInput ? descriptionInput.value.trim() : '';
     
     // Валидация
     if (!number) {
@@ -558,10 +596,13 @@ function addProduct() {
         currentEditingIndex = -1;
         
         // Меняем текст кнопки обратно
-        document.getElementById('add-product-btn').innerHTML = `
-            <i class="fas fa-save"></i>
-            <span>СОХРАНИТЬ ТОВАР</span>
-        `;
+        const addProductBtn = document.getElementById('add-product-btn');
+        if (addProductBtn) {
+            addProductBtn.innerHTML = `
+                <i class="fas fa-save"></i>
+                <span>СОХРАНИТЬ ТОВАР</span>
+            `;
+        }
     } else {
         // Добавляем новый товар
         allProducts.push(product);
@@ -580,22 +621,34 @@ function addProduct() {
 
 // Редактирование товара
 function editProduct(index) {
+    if (index < 0 || index >= allProducts.length) return;
+    
     const product = allProducts[index];
     currentEditingIndex = index;
     
     // Заполняем форму
-    document.getElementById('product-number').value = product.number;
-    document.getElementById('product-price').value = product.price.replace(' ₽', '');
-    document.getElementById('product-months').value = product.months || '?';
-    document.getElementById('product-operator').value = product.operator || '';
-    document.getElementById('product-category').value = product.categoryId;
-    document.getElementById('product-description').value = product.description || '';
+    const numberInput = document.getElementById('product-number');
+    const priceInput = document.getElementById('product-price');
+    const monthsInput = document.getElementById('product-months');
+    const operatorInput = document.getElementById('product-operator');
+    const categoryInput = document.getElementById('product-category');
+    const descriptionInput = document.getElementById('product-description');
+    const addProductBtn = document.getElementById('add-product-btn');
+    
+    if (numberInput) numberInput.value = product.number;
+    if (priceInput) priceInput.value = product.price.replace(' ₽', '');
+    if (monthsInput) monthsInput.value = product.months || '?';
+    if (operatorInput) operatorInput.value = product.operator || '';
+    if (categoryInput) categoryInput.value = product.categoryId;
+    if (descriptionInput) descriptionInput.value = product.description || '';
     
     // Меняем текст кнопки
-    document.getElementById('add-product-btn').innerHTML = `
-        <i class="fas fa-save"></i>
-        <span>ОБНОВИТЬ ТОВАР</span>
-    `;
+    if (addProductBtn) {
+        addProductBtn.innerHTML = `
+            <i class="fas fa-save"></i>
+            <span>ОБНОВИТЬ ТОВАР</span>
+        `;
+    }
     
     // Переключаемся на форму
     switchTab('add-product');
@@ -603,6 +656,8 @@ function editProduct(index) {
 
 // Удаление товара
 function deleteProduct(index) {
+    if (index < 0 || index >= allProducts.length) return;
+    
     if (confirm(`❌ Удалить товар "${allProducts[index].number}"?`)) {
         const deleted = allProducts.splice(index, 1)[0];
         saveToStorage(); // Автоматически обновляем сайт
@@ -612,18 +667,28 @@ function deleteProduct(index) {
 
 // Сброс формы товара
 function resetProductForm() {
-    document.getElementById('product-number').value = '';
-    document.getElementById('product-price').value = '';
-    document.getElementById('product-months').value = '?';
-    document.getElementById('product-operator').value = '';
-    document.getElementById('product-category').value = 'russian';
-    document.getElementById('product-description').value = '';
+    const numberInput = document.getElementById('product-number');
+    const priceInput = document.getElementById('product-price');
+    const monthsInput = document.getElementById('product-months');
+    const operatorInput = document.getElementById('product-operator');
+    const categoryInput = document.getElementById('product-category');
+    const descriptionInput = document.getElementById('product-description');
+    const addProductBtn = document.getElementById('add-product-btn');
+    
+    if (numberInput) numberInput.value = '';
+    if (priceInput) priceInput.value = '';
+    if (monthsInput) monthsInput.value = '?';
+    if (operatorInput) operatorInput.value = '';
+    if (categoryInput) categoryInput.value = 'russian';
+    if (descriptionInput) descriptionInput.value = '';
     
     // Восстанавливаем кнопку
-    document.getElementById('add-product-btn').innerHTML = `
-        <i class="fas fa-save"></i>
-        <span>СОХРАНИТЬ ТОВАР</span>
-    `;
+    if (addProductBtn) {
+        addProductBtn.innerHTML = `
+            <i class="fas fa-save"></i>
+            <span>СОХРАНИТЬ ТОВАР</span>
+        `;
+    }
     
     currentEditingIndex = -1;
     
@@ -640,32 +705,46 @@ function resetProductForm() {
 
 // Обновление предпросмотра товара
 function updateProductPreview() {
-    const number = document.getElementById('product-number')?.value || '+7 (XXX) XXX-XX-XX';
-    const price = document.getElementById('product-price')?.value || '0';
-    const months = document.getElementById('product-months')?.value || '?';
-    const operator = document.getElementById('product-operator')?.value || 'Не указано';
-    const categoryId = document.getElementById('product-category')?.value || 'russian';
-    const description = document.getElementById('product-description')?.value || '';
+    const numberInput = document.getElementById('product-number');
+    const priceInput = document.getElementById('product-price');
+    const monthsInput = document.getElementById('product-months');
+    const operatorInput = document.getElementById('product-operator');
+    const categoryInput = document.getElementById('product-category');
+    const descriptionInput = document.getElementById('product-description');
+    
+    const number = numberInput ? numberInput.value : '+7 (XXX) XXX-XX-XX';
+    const price = priceInput ? priceInput.value : '0';
+    const months = monthsInput ? monthsInput.value : '?';
+    const operator = operatorInput ? operatorInput.value : 'Не указано';
+    const categoryId = categoryInput ? categoryInput.value : 'russian';
+    const description = descriptionInput ? descriptionInput.value : '';
     
     const category = categories.find(c => c.id === categoryId) || categories[0];
-    
-    // Обновляем предпросмотр
     const preview = document.getElementById('product-preview');
+    
     if (preview) {
-        preview.querySelector('.preview-number').textContent = number;
-        preview.querySelector('.preview-price').textContent = `${price} ₽`;
-        preview.querySelector('.preview-desc').textContent = description || 'Описание отсутствует';
-        preview.querySelector('.preview-details').innerHTML = `
-            <div class="detail-item">
-                <span>Срок отлета:</span>
-                <span>${months === 'permanent' ? 'Постоянный' : (months === '?' ? 'Неизвестно' : months + ' мес')}</span>
-            </div>
-            <div class="detail-item">
-                <span>Оператор:</span>
-                <span>${operator}</span>
-            </div>
-        `;
-        preview.querySelector('.preview-category').textContent = `${category.icon} ${category.name}`;
+        const previewNumber = preview.querySelector('.preview-number');
+        const previewPrice = preview.querySelector('.preview-price');
+        const previewDesc = preview.querySelector('.preview-desc');
+        const previewDetails = preview.querySelector('.preview-details');
+        const previewCategory = preview.querySelector('.preview-category');
+        
+        if (previewNumber) previewNumber.textContent = number;
+        if (previewPrice) previewPrice.textContent = `${price} ₽`;
+        if (previewDesc) previewDesc.textContent = description || 'Описание отсутствует';
+        if (previewDetails) {
+            previewDetails.innerHTML = `
+                <div class="detail-item">
+                    <span>Срок отлета:</span>
+                    <span>${months === 'permanent' ? 'Постоянный' : (months === '?' ? 'Неизвестно' : months + ' мес')}</span>
+                </div>
+                <div class="detail-item">
+                    <span>Оператор:</span>
+                    <span>${operator}</span>
+                </div>
+            `;
+        }
+        if (previewCategory) previewCategory.textContent = `${category.icon} ${category.name}`;
     }
 }
 
@@ -803,10 +882,20 @@ function closeModal() {
 
 // Добавить новую категорию
 function addNewCategory() {
-    const name = document.getElementById('new-category-name')?.value.trim();
-    const icon = document.getElementById('new-category-icon')?.value.trim();
-    const id = document.getElementById('new-category-id')?.value.trim().toLowerCase().replace(/\s+/g, '_');
-    const desc = document.getElementById('new-category-desc')?.value.trim();
+    const nameInput = document.getElementById('new-category-name');
+    const iconInput = document.getElementById('new-category-icon');
+    const idInput = document.getElementById('new-category-id');
+    const descInput = document.getElementById('new-category-desc');
+    
+    if (!nameInput || !iconInput || !idInput) {
+        alert('Ошибка: форма не найдена');
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const icon = iconInput.value.trim();
+    const id = idInput.value.trim().toLowerCase().replace(/\s+/g, '_');
+    const desc = descInput ? descInput.value.trim() : '';
     
     if (!name || !icon || !id) {
         alert('Заполните обязательные поля');
@@ -845,6 +934,8 @@ function addNewCategory() {
 
 // Редактирование категории
 function editCategory(index) {
+    if (index < 0 || index >= categories.length) return;
+    
     const newName = prompt('Новое название категории:', categories[index].name);
     const newIcon = prompt('Новая иконка (эмодзи):', categories[index].icon);
     const newDesc = prompt('Новое описание:', categories[index].description);
@@ -860,6 +951,8 @@ function editCategory(index) {
 
 // Удаление категории
 function deleteCategory(index) {
+    if (index < 0 || index >= categories.length) return;
+    
     const category = categories[index];
     const productCount = allProducts.filter(p => p.categoryId === category.id).length;
     
@@ -956,7 +1049,10 @@ function updateExportTab() {
     `;
     
     // Добавляем обработчик импорта
-    document.getElementById('import-file')?.addEventListener('change', handleFileImport);
+    const importFile = document.getElementById('import-file');
+    if (importFile) {
+        importFile.addEventListener('change', handleFileImport);
+    }
 }
 
 function calculateTotalValue() {
@@ -1652,7 +1748,9 @@ function updateSystemInfo() {
 // Toggle меню (для мобильных устройств)
 function toggleMenu() {
     const sidebar = document.querySelector('.admin-sidebar');
-    sidebar.classList.toggle('collapsed');
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+    }
 }
 
 // Добавляем CSS анимацию shake и стили
@@ -1750,161 +1848,6 @@ style.textContent = `
         border-color: #00ffff;
         transform: translateY(-3px);
         box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
-    }
-    
-    .category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 15px;
-    }
-    
-    .category-icon {
-        font-size: 2rem;
-    }
-    
-    .category-name {
-        color: #00ffff;
-        font-weight: bold;
-        font-size: 1.3rem;
-        margin-bottom: 5px;
-    }
-    
-    .category-id {
-        color: #888;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-    }
-    
-    .category-desc {
-        color: #ccc;
-        font-size: 0.9rem;
-        margin-bottom: 15px;
-    }
-    
-    .category-stats {
-        display: flex;
-        gap: 15px;
-        color: #ff9900;
-        font-weight: bold;
-    }
-    
-    .stat {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .export-info, .backup-info {
-        margin-bottom: 30px;
-    }
-    
-    .info-card {
-        background: rgba(0, 20, 0, 0.2);
-        border: 1px solid rgba(0, 255, 0, 0.2);
-        border-radius: 10px;
-        padding: 25px;
-    }
-    
-    .export-actions, .backup-actions {
-        margin-bottom: 30px;
-    }
-    
-    .export-actions h3, .backup-actions h3 {
-        color: #00ffff;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .action-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-    
-    .action-btn.large {
-        padding: 20px;
-        font-size: 1.1rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        text-align: center;
-    }
-    
-    .action-btn.large i {
-        font-size: 1.5rem;
-    }
-    
-    .action-btn.danger {
-        background: rgba(255, 50, 50, 0.2);
-        border-color: rgba(255, 51, 51, 0.5);
-        color: #ff6666;
-    }
-    
-    .action-btn.danger:hover {
-        background: rgba(255, 50, 50, 0.3);
-        box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
-    }
-    
-    .backup-notice {
-        background: rgba(255, 153, 0, 0.1);
-        border: 1px solid rgba(255, 153, 0, 0.3);
-        border-radius: 8px;
-        padding: 15px;
-        color: #ff9900;
-        font-size: 0.9rem;
-    }
-    
-    .settings-sections {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .settings-card {
-        background: rgba(0, 20, 0, 0.2);
-        border: 1px solid rgba(0, 255, 0, 0.2);
-        border-radius: 10px;
-        padding: 25px;
-    }
-    
-    .settings-card h3 {
-        color: #00ffff;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .settings-group {
-        margin-bottom: 20px;
-    }
-    
-    .settings-group:last-child {
-        margin-bottom: 0;
-    }
-    
-    .settings-group label {
-        display: block;
-        color: #00ffff;
-        margin-bottom: 10px;
-    }
-    
-    .password-display {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-    
-    .settings-footer {
-        display: flex;
-        justify-content: space-between;
-        padding-top: 20px;
-        border-top: 1px solid rgba(0, 255, 0, 0.2);
     }
 `;
 document.head.appendChild(style);
