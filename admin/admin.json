@@ -1,5 +1,39 @@
 {
-  "last_update": "Загрузка...",
-  "version": "2.0",
-  "categories": []
+  "name": "IGLOV SHOP Admin",
+  "version": "3.0",
+  "description": "Панель управления магазином IGLOV SHOP",
+  "config": {
+    "storage_key": "iglova_admin_data_v3",
+    "backup_key": "iglova_shop_backup_v3",
+    "default_password": "maybelaterfuck"
+  },
+  "default_categories": [
+    {
+      "id": "russian",
+      "name": "НОМЕРА РФ",
+      "icon": "🇷🇺",
+      "description": "Российские номера с гарантией отлета"
+    },
+    {
+      "id": "foreign",
+      "name": "ЗАРУБЕЖНЫЕ",
+      "icon": "🌍",
+      "description": "Номера других стран"
+    },
+    {
+      "id": "nft_users",
+      "name": "NFT ЮЗЕРЫ",
+      "icon": "🎨",
+      "description": "NFT аккаунты и профили"
+    },
+    {
+      "id": "nft_gifts",
+      "name": "NFT ПОДАРКИ",
+      "icon": "🎁",
+      "description": "Цифровые подарки и активы"
+    }
+  ],
+  "empty_products_message": "Товаров пока нет. Добавьте первый товар!",
+  "last_modified": "2025-12-05T00:00:00.000Z",
+  "owner": "@useriglov"
 }
