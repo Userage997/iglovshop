@@ -140,61 +140,94 @@ function openAdminPanel() {
 function loadProducts() {
     console.log('[SITE] Загрузка товаров...');
     
-    // Всегда грузим с GitHub (с кэш-бастером)
-    fetch('https://raw.githubusercontent.com/Userage997/iglovshop/main/products.json?v=' + Date.now())
+    // ВСЕГДА сначала грузим с GitHub
+    const githubUrl = 'https://raw.githubusercontent.com/Userage997/iglovshop/main/products.json?t=' + Date.now();
+    
+    fetch(githubUrl)
         .then(response => {
-            if (!response.ok) throw new Error('Файл не найден на GitHub');
+            if (!response.ok) {
+                throw new Error(`GitHub: ${response.status} ${response.statusText}`);
+            }
             return response.json();
         })
         .then(data => {
+            console.log('[SITE] Загружено с GitHub:', data);
+            
+            // Проверяем структуру данных
+            if (!data || !data.categories) {
+                throw new Error('Неверный формат данных с GitHub');
+            }
+            
             allProductsData = data;
-            console.log('[SITE] Загружено с GitHub');
             displaySiteProducts(data);
             
             // Сохраняем в localStorage как кэш
             localStorage.setItem('iglova_shop_products', JSON.stringify(data));
             updateLastUpdateTime();
-        })
-        .catch(error => {
-            console.error('[SITE] Ошибка загрузки с GitHub:', error);
             
-            // Если GitHub недоступен, пробуем локальный файл
-            fetch('products.json?v=' + Date.now())
-                .then(response => {
-                    if (!response.ok) throw new Error('Локальный файл не найден');
-                    return response.json();
-                })
-                .then(data => {
-                    allProductsData = data;
-                    console.log('[SITE] Загружено из локального файла');
-                    displaySiteProducts(data);
-                    localStorage.setItem('iglova_shop_products', JSON.stringify(data));
+            // Показываем статус
+            const statusElement = document.getElementById('update-status');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-success">
+                        <i class="fas fa-check-circle"></i> Данные с GitHub загружены
+                    </div>
+                `;
+                setTimeout(() => { statusElement.innerHTML = ''; }, 3000);
+            }
+        })
+        .catch(githubError => {
+            console.error('[SITE] GitHub ошибка:', githubError);
+            
+            // Если GitHub недоступен, пробуем localStorage
+            const localData = localStorage.getItem('iglova_shop_products');
+            if (localData) {
+                try {
+                    allProductsData = JSON.parse(localData);
+                    console.log('[SITE] Используем локальные данные');
+                    displaySiteProducts(allProductsData);
                     updateLastUpdateTime();
-                })
-                .catch(secondError => {
-                    console.error('[SITE] Все источники недоступны:', secondError);
                     
-                    // Показываем сообщение
-                    const container = document.getElementById('products-container');
-                    if (container) {
-                        container.innerHTML = `
-                            <div class="no-products">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <h3>Нет подключения к данным</h3>
-                                <p>Попробуйте обновить страницу позже</p>
-                                <p class="loading-subtext">Ошибка: ${error.message}</p>
+                    // Показываем предупреждение
+                    const statusElement = document.getElementById('update-status');
+                    if (statusElement) {
+                        statusElement.innerHTML = `
+                            <div class="status-error">
+                                <i class="fas fa-exclamation-triangle"></i> GitHub недоступен. Используем локальные данные
                             </div>
                         `;
+                        setTimeout(() => { statusElement.innerHTML = ''; }, 3000);
                     }
-                });
+                    
+                    showSiteNotification('⚠️ GitHub недоступен. Используем локальные данные', 'error');
+                } catch (localError) {
+                    showNoProductsError(githubError.message);
+                }
+            } else {
+                showNoProductsError(githubError.message);
+            }
         });
+}
+
+function showNoProductsError(message) {
+    const container = document.getElementById('products-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="no-products">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Ошибка загрузки товаров</h3>
+                <p>${message || 'Данные недоступны'}</p>
+                <button onclick="forceRefreshProducts()" class="retry-btn">
+                    <i class="fas fa-redo"></i> Попробовать снова
+                </button>
+                <p class="loading-subtext">Проверьте файл products.json на GitHub</p>
+            </div>
+        `;
+    }
 }
 
 function forceRefreshProducts() {
     console.log('[SITE] Принудительное обновление товаров');
-    
-    // Очищаем КЭШ localStorage
-    localStorage.removeItem('iglova_shop_products');
     
     // Показываем загрузку
     const container = document.getElementById('products-container');
@@ -202,8 +235,8 @@ function forceRefreshProducts() {
         container.innerHTML = `
             <div class="loading-products">
                 <div class="loading-spinner"></div>
-                <p>ОБНОВЛЕНИЕ С GITHUB...</p>
-                <p class="loading-subtext">Загрузка актуальных данных...</p>
+                <p>ЗАГРУЗКА С GITHUB...</p>
+                <p class="loading-subtext">Обновление данных...</p>
             </div>
         `;
     }
@@ -213,23 +246,33 @@ function forceRefreshProducts() {
     if (statusElement) {
         statusElement.innerHTML = `
             <div class="status-loading">
-                <i class="fas fa-sync fa-spin"></i> Соединение с GitHub...
+                <i class="fas fa-sync fa-spin"></i> Подключение к GitHub...
             </div>
         `;
     }
     
-    // Загружаем с GitHub (принудительно без кэша)
-    fetch('https://raw.githubusercontent.com/Userage997/iglovshop/main/products.json?force=' + Date.now())
+    // Принудительно грузим с GitHub (без кэша)
+    const githubUrl = 'https://raw.githubusercontent.com/Userage997/iglovshop/main/products.json?force_refresh=' + Date.now();
+    
+    fetch(githubUrl)
         .then(response => {
-            if (!response.ok) throw new Error('GitHub недоступен');
+            if (!response.ok) {
+                throw new Error(`GitHub вернул ошибку: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
+            console.log('[SITE] Данные обновлены с GitHub');
+            
+            // Проверяем данные
+            if (!data || !data.categories) {
+                throw new Error('Некорректный формат данных с GitHub');
+            }
+            
             allProductsData = data;
-            console.log('[SITE] Обновлено с GitHub');
             displaySiteProducts(data);
             
-            // Обновляем localStorage
+            // ОБНОВЛЯЕМ localStorage
             localStorage.setItem('iglova_shop_products', JSON.stringify(data));
             updateLastUpdateTime();
             
@@ -243,9 +286,24 @@ function forceRefreshProducts() {
                     statusElement.innerHTML = '';
                 }, 3000);
             }
+            
+            showSiteNotification('✅ Товары обновлены с GitHub', 'success');
         })
         .catch(error => {
             console.error('[SITE] Ошибка обновления:', error);
+            
+            // Пробуем показать старые данные из localStorage
+            const localData = localStorage.getItem('iglova_shop_products');
+            if (localData) {
+                try {
+                    allProductsData = JSON.parse(localData);
+                    displaySiteProducts(allProductsData);
+                    
+                    showSiteNotification('⚠️ GitHub недоступен. Используем старые данные', 'error');
+                } catch (e) {
+                    // Ничего не делаем
+                }
+            }
             
             if (statusElement) {
                 statusElement.innerHTML = `
@@ -253,15 +311,12 @@ function forceRefreshProducts() {
                         <i class="fas fa-exclamation-triangle"></i> Ошибка: ${error.message}
                     </div>
                 `;
+                setTimeout(() => {
+                    statusElement.innerHTML = '';
+                }, 5000);
             }
             
-            // Пробуем загрузить из localStorage (если там есть старые данные)
-            const localData = localStorage.getItem('iglova_shop_products');
-            if (localData) {
-                allProductsData = JSON.parse(localData);
-                displaySiteProducts(allProductsData);
-                showSiteNotification('⚠️ Используются локальные данные (GitHub недоступен)', 'error');
-            }
+            showSiteNotification(`❌ Ошибка: ${error.message}`, 'error');
         });
 }
 
