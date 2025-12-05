@@ -5,7 +5,12 @@ const CONFIG = {
     backupKey: "iglova_shop_backup_v3",
     storageKey: "iglova_admin_data_v3",
     version: "3.0",
-    owner: "@useriglov"
+    owner: "@useriglov",
+    github: {
+        repo: "Userage997/iglovshop",
+        file: "products.json",
+        rawUrl: "https://raw.githubusercontent.com/Userage997/iglovshop/main/products.json"
+    }
 };
 
 // Глобальные переменные
@@ -352,12 +357,161 @@ function autoUpdateWebsite() {
         
         // Показываем уведомление (опционально)
         if (document.querySelector('.form-status')) {
-            showFormStatus('success', `✅ Сайт обновлен (${allProducts.length} товаров)`);
+            showFormStatus('success', `✅ Локальные данные обновлены (${allProducts.length} товаров)`);
         }
         
     } catch (error) {
         console.error('[ERROR] Auto-update failed:', error);
     }
+}
+
+// Функция для обновления данных на GitHub
+function updateGitHubProducts() {
+    const statusElement = document.getElementById('add-product-status') || 
+                         document.getElementById('update-site-status') ||
+                         document.querySelector('.form-status');
+    
+    try {
+        const exportData = prepareDataForExport();
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        
+        // Создаем Blob для скачивания
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        // Формируем ссылки
+        const githubEditUrl = `https://github.com/${CONFIG.github.repo}/edit/main/${CONFIG.github.file}`;
+        const githubRawUrl = `${CONFIG.github.rawUrl}?v=${Date.now()}`;
+        const githubRepoUrl = `https://github.com/${CONFIG.github.repo}`;
+        
+        // Показываем подробную инструкцию
+        const message = `
+            <div class="status success" style="text-align: left;">
+                <h4><i class="fas fa-check-circle"></i> Данные готовы для GitHub!</h4>
+                <p><strong>Шаг 1:</strong> Скачайте файл: 
+                    <a href="${url}" download="products.json" style="color:#00ffff; font-weight:bold;">
+                        <i class="fas fa-download"></i> products.json
+                    </a>
+                </p>
+                <p><strong>Шаг 2:</strong> Загрузите его:</p>
+                <ul style="margin-left:20px; margin-bottom:15px;">
+                    <li><a href="${githubEditUrl}" target="_blank" style="color:#00ffff;">
+                        ✏️ В редакторе GitHub (просто вставьте содержимое)
+                    </a></li>
+                    <li>Или через загрузку файлов в репозитории</li>
+                </ul>
+                <p><strong>Шаг 3:</strong> Через 1-2 минуты проверьте сайт:
+                    <a href="${githubRawUrl}" target="_blank" style="color:#00ffff;">
+                        ${githubRawUrl}
+                    </a>
+                </p>
+                <div style="margin-top:15px; padding:10px; background:rgba(0,255,0,0.1); border:1px solid #0f0;">
+                    <strong><i class="fas fa-code"></i> JSON для копирования:</strong>
+                    <textarea id="github-json-text" 
+                              style="width:100%; height:150px; background:#000; color:#0f0; 
+                                     border:1px solid #0f0; padding:10px; margin-top:10px;
+                                     font-family:'JetBrains Mono', monospace; font-size:12px;"
+                              readonly>${jsonStr}</textarea>
+                    <button onclick="copyGitHubJson()" 
+                            style="margin-top:10px; padding:8px 15px; background:rgba(0,100,255,0.2); 
+                                   border:1px solid #00aaff; color:#66aaff; cursor:pointer;">
+                        <i class="fas fa-copy"></i> Копировать JSON
+                    </button>
+                </div>
+                <div style="margin-top:15px; font-size:0.9em; color:#888;">
+                    <i class="fas fa-info-circle"></i> После загрузки на GitHub, на сайте 
+                    <a href="/iglovshop/" target="_blank" style="color:#00ffff;">нажмите "Обновить базу товаров"</a>
+                </div>
+            </div>
+        `;
+        
+        // Показываем сообщение
+        if (statusElement) {
+            statusElement.innerHTML = message;
+        } else {
+            // Создаем новое уведомление
+            const notification = document.createElement('div');
+            notification.className = 'github-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 30, 0, 0.95);
+                border: 2px solid #00ff00;
+                padding: 20px;
+                border-radius: 10px;
+                z-index: 10000;
+                max-width: 500px;
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            `;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            // Добавляем кнопку закрытия
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '✕';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: transparent;
+                border: none;
+                color: #888;
+                font-size: 20px;
+                cursor: pointer;
+            `;
+            closeBtn.onclick = () => notification.remove();
+            notification.appendChild(closeBtn);
+        }
+        
+        // Освобождаем URL через 10 минут
+        setTimeout(() => URL.revokeObjectURL(url), 600000);
+        
+        return url;
+        
+    } catch (error) {
+        console.error('[GITHUB] Ошибка обновления:', error);
+        const errorMsg = `<div class="status error">
+            <i class="fas fa-exclamation-circle"></i> Ошибка: ${error.message}
+        </div>`;
+        
+        if (statusElement) {
+            statusElement.innerHTML = errorMsg;
+        }
+        return null;
+    }
+}
+
+// Функция для копирования JSON в буфер обмена
+async function copyGitHubJson() {
+    try {
+        const textarea = document.getElementById('github-json-text');
+        if (textarea) {
+            await navigator.clipboard.writeText(textarea.value);
+            showFormStatus('success', '📋 JSON скопирован в буфер обмена!');
+        }
+    } catch (err) {
+        showFormStatus('error', '❌ Ошибка копирования: ' + err.message);
+    }
+}
+
+// Обновление сайта (главная функция)
+function updateWebsite() {
+    const status = updateGitHubProducts();
+    if (status) {
+        // Синхронизируем с другими вкладками
+        syncWithOtherTabs();
+        
+        // Показываем общее уведомление
+        showFormStatus('success', 
+            `✅ Данные подготовлены для GitHub! Товаров: ${allProducts.length}, Категорий: ${categories.length}`);
+    }
+}
+
+// Обновление сайта из дашборда
+function updateWebsiteFromDashboard() {
+    updateWebsite();
+    updateDashboard();
 }
 
 // Обновление интерфейса
@@ -750,17 +904,27 @@ function updateProductPreview() {
 
 // Показать статус формы
 function showFormStatus(type, message) {
-    const statusElement = document.getElementById('add-product-status');
-    if (!statusElement) return;
+    let statusElement = document.getElementById('add-product-status');
+    if (!statusElement) {
+        statusElement = document.getElementById('update-site-status');
+    }
+    if (!statusElement) {
+        // Создаем временный элемент
+        statusElement = document.createElement('div');
+        statusElement.className = 'form-status';
+        document.querySelector('.admin-content').prepend(statusElement);
+    }
     
     statusElement.textContent = message;
     statusElement.className = `form-status ${type}`;
     
-    // Автоматическое скрытие
-    setTimeout(() => {
-        statusElement.className = 'form-status';
-        statusElement.textContent = '';
-    }, 5000);
+    // Автоматическое скрытие для success
+    if (type === 'success') {
+        setTimeout(() => {
+            statusElement.className = 'form-status';
+            statusElement.textContent = '';
+        }, 5000);
+    }
 }
 
 // Отображение категорий
@@ -969,111 +1133,6 @@ function deleteCategory(index) {
     }
 }
 
-// Обновление вкладки экспорта
-function updateExportTab() {
-    const container = document.getElementById('tab-export');
-    if (!container) return;
-    
-    const lastUpdate = getLastUpdate();
-    
-    container.innerHTML = `
-        <div class="tab-header">
-            <h2><i class="fas fa-download"></i> Экспорт данных</h2>
-        </div>
-        
-        <div class="export-info">
-            <div class="info-card">
-                <h3><i class="fas fa-database"></i> Статус данных</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span>Всего товаров:</span>
-                        <span style="color: #00ff00;">${allProducts.length}</span>
-                    </div>
-                    <div class="info-item">
-                        <span>Категорий:</span>
-                        <span style="color: #00ffff;">${categories.length}</span>
-                    </div>
-                    <div class="info-item">
-                        <span>Общая стоимость:</span>
-                        <span style="color: #ff9900;">${calculateTotalValue()} ₽</span>
-                    </div>
-                    <div class="info-item">
-                        <span>Последнее обновление:</span>
-                        <span>${lastUpdate}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="export-actions">
-            <h3><i class="fas fa-file-export"></i> Экспорт в файл</h3>
-            <div class="action-grid">
-                <button class="action-btn large" onclick="exportToJSON()">
-                    <i class="fas fa-file-code"></i>
-                    <span>Экспорт в JSON</span>
-                </button>
-                <button class="action-btn large" onclick="exportToCSV()">
-                    <i class="fas fa-file-csv"></i>
-                    <span>Экспорт в CSV</span>
-                </button>
-                <button class="action-btn large" onclick="copyToClipboard()">
-                    <i class="fas fa-copy"></i>
-                    <span>Копировать JSON</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="export-actions">
-            <h3><i class="fas fa-upload"></i> Импорт данных</h3>
-            <div class="import-section">
-                <input type="file" id="import-file" accept=".json,.csv" style="display: none;">
-                <button class="action-btn large" onclick="document.getElementById('import-file').click()">
-                    <i class="fas fa-file-import"></i>
-                    <span>Выбрать файл для импорта</span>
-                </button>
-                <p class="form-hint">Поддерживаются JSON и CSV форматы. Импорт заменит текущие данные.</p>
-            </div>
-        </div>
-        
-        <div class="export-actions">
-            <h3><i class="fas fa-sync-alt"></i> Обновление сайта</h3>
-            <div class="update-section">
-                <button class="action-btn large primary" onclick="updateWebsite()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>ОБНОВИТЬ САЙТ</span>
-                </button>
-                <p class="form-hint">Создаст файл products.json для загрузки на GitHub</p>
-                <div id="update-site-status" class="form-status"></div>
-            </div>
-        </div>
-    `;
-    
-    // Добавляем обработчик импорта
-    const importFile = document.getElementById('import-file');
-    if (importFile) {
-        importFile.addEventListener('change', handleFileImport);
-    }
-}
-
-function calculateTotalValue() {
-    return allProducts.reduce((sum, product) => {
-        const price = parseFloat(product.price) || 0;
-        return sum + price;
-    }, 0);
-}
-
-function getLastUpdate() {
-    try {
-        const saved = localStorage.getItem(CONFIG.storageKey);
-        if (saved) {
-            const data = JSON.parse(saved);
-            const date = new Date(data.timestamp);
-            return date.toLocaleString('ru-RU');
-        }
-    } catch (e) {}
-    return 'Неизвестно';
-}
-
 // Подготовка данных для экспорта
 function prepareDataForExport() {
     // Группируем товары по категориям
@@ -1108,6 +1167,133 @@ function prepareDataForExport() {
     };
     
     return result;
+}
+
+// Обновление вкладки экспорта
+function updateExportTab() {
+    const container = document.getElementById('tab-export');
+    if (!container) return;
+    
+    const lastUpdate = getLastUpdate();
+    const githubStatus = checkGitHubStatus();
+    
+    container.innerHTML = `
+        <div class="tab-header">
+            <h2><i class="fas fa-download"></i> Экспорт данных и GitHub</h2>
+        </div>
+        
+        <div class="export-info">
+            <div class="info-card">
+                <h3><i class="fas fa-database"></i> Статус данных</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>Всего товаров:</span>
+                        <span style="color: #00ff00;">${allProducts.length}</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Категорий:</span>
+                        <span style="color: #00ffff;">${categories.length}</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Общая стоимость:</span>
+                        <span style="color: #ff9900;">${calculateTotalValue()} ₽</span>
+                    </div>
+                    <div class="info-item">
+                        <span>GitHub статус:</span>
+                        <span style="color: ${githubStatus.color};">${githubStatus.text}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <h3><i class="fas fa-file-export"></i> Экспорт в файл</h3>
+            <div class="action-grid">
+                <button class="action-btn large" onclick="exportToJSON()">
+                    <i class="fas fa-file-code"></i>
+                    <span>Экспорт в JSON</span>
+                </button>
+                <button class="action-btn large" onclick="exportToCSV()">
+                    <i class="fas fa-file-csv"></i>
+                    <span>Экспорт в CSV</span>
+                </button>
+                <button class="action-btn large" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i>
+                    <span>Копировать JSON</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <h3><i class="fas fa-cloud-upload-alt"></i> Обновление на GitHub</h3>
+            <div class="update-section">
+                <button class="action-btn large primary" onclick="updateWebsite()">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>ОБНОВИТЬ НА GITHUB</span>
+                </button>
+                <p class="form-hint">Создаст файл products.json для загрузки на GitHub. После загрузки, на сайте нажмите "Обновить базу товаров"</p>
+                <div id="update-site-status" class="form-status"></div>
+                <div style="margin-top: 15px;">
+                    <a href="https://github.com/${CONFIG.github.repo}/edit/main/${CONFIG.github.file}" 
+                       target="_blank" class="action-btn" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Открыть редактор GitHub</span>
+                    </a>
+                    <a href="${CONFIG.github.rawUrl}" 
+                       target="_blank" class="action-btn" style="display: inline-flex; align-items: center; gap: 8px; margin-left: 10px;">
+                        <i class="fas fa-eye"></i>
+                        <span>Посмотреть текущий файл</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <h3><i class="fas fa-upload"></i> Импорт данных</h3>
+            <div class="import-section">
+                <input type="file" id="import-file" accept=".json,.csv" style="display: none;">
+                <button class="action-btn large" onclick="document.getElementById('import-file').click()">
+                    <i class="fas fa-file-import"></i>
+                    <span>Выбрать файл для импорта</span>
+                </button>
+                <p class="form-hint">Поддерживаются JSON и CSV форматы. Импорт заменит текущие данные.</p>
+            </div>
+        </div>
+    `;
+    
+    // Добавляем обработчик импорта
+    const importFile = document.getElementById('import-file');
+    if (importFile) {
+        importFile.addEventListener('change', handleFileImport);
+    }
+}
+
+function calculateTotalValue() {
+    return allProducts.reduce((sum, product) => {
+        const price = parseFloat(product.price) || 0;
+        return sum + price;
+    }, 0);
+}
+
+function getLastUpdate() {
+    try {
+        const saved = localStorage.getItem(CONFIG.storageKey);
+        if (saved) {
+            const data = JSON.parse(saved);
+            const date = new Date(data.timestamp);
+            return date.toLocaleString('ru-RU');
+        }
+    } catch (e) {}
+    return 'Неизвестно';
+}
+
+function checkGitHubStatus() {
+    // В реальном приложении здесь можно сделать fetch запрос
+    // к GitHub API для проверки доступности файла
+    return {
+        text: 'Проверьте подключение',
+        color: '#ff9900'
+    };
 }
 
 // Экспорт в JSON
@@ -1280,117 +1466,6 @@ function processImportedData(data) {
     saveToStorage();
     updateUI();
     showFormStatus('success', `✅ Импортировано ${allProducts.length} товаров`);
-}
-
-// ===== НОВАЯ ФУНКЦИЯ ДЛЯ ГЛАВНОЙ ПАНЕЛИ =====
-function updateWebsiteFromDashboard() {
-    try {
-        // 1. Подготавливаем данные
-        const data = prepareDataForExport();
-        const jsonStr = JSON.stringify(data, null, 2);
-        
-        // 2. Сохраняем в localStorage (для мгновенного отображения)
-        localStorage.setItem('iglova_shop_products', jsonStr);
-        
-        // 3. Синхронизируем с другими вкладками
-        syncWithOtherTabs();
-        
-        // 4. Показываем уведомление
-        showFormStatus('success', `✅ Сайт обновлен! Товаров: ${allProducts.length}, Категорий: ${categories.length}`);
-        
-        // 5. Обновляем статистику на дашборде
-        updateDashboard();
-        
-        // 6. Добавляем запись в активность
-        const recentActivity = document.getElementById('recent-activity');
-        if (recentActivity) {
-            const activityItem = document.createElement('div');
-            activityItem.className = 'activity-item';
-            activityItem.innerHTML = `
-                <i class="fas fa-sync-alt" style="color: #00ff00;"></i>
-                <div class="activity-text">
-                    <p>Сайт обновлен</p>
-                    <small>${new Date().toLocaleTimeString('ru-RU')}</small>
-                </div>
-            `;
-            recentActivity.prepend(activityItem);
-            
-            // Ограничиваем количество записей
-            const items = recentActivity.querySelectorAll('.activity-item');
-            if (items.length > 5) {
-                items[items.length - 1].remove();
-            }
-        }
-        
-        console.log('[DASHBOARD] Сайт обновлен из главной панели');
-        
-    } catch (error) {
-        console.error('Ошибка обновления сайта:', error);
-        showFormStatus('error', '❌ Ошибка обновления сайта');
-    }
-}
-
-// ФУНКЦИЯ ДЛЯ ВКЛАДКИ ЭКСПОРТ (скачивание файла)
-function updateWebsite() {
-    try {
-        const data = prepareDataForExport();
-        const jsonStr = JSON.stringify(data, null, 2);
-        const statusElement = document.getElementById('update-site-status');
-        
-        if (!statusElement) {
-            showFormStatus('error', 'Элемент статуса не найден. Переключитесь на вкладку "Экспорт"');
-            return;
-        }
-        
-        // 1. Сохраняем в localStorage для немедленного отображения
-        localStorage.setItem('iglova_shop_products', jsonStr);
-        
-        // 2. Создаем файл для скачивания
-        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        
-        statusElement.innerHTML = `
-            <div class="status success">
-                <h4><i class="fas fa-check-circle"></i> Сайт обновлен!</h4>
-                <p>✅ Данные сохранены в браузере</p>
-                <p>Для обновления на GitHub:</p>
-                <ol>
-                    <li>Скачайте файл: 
-                        <a href="${url}" download="products.json" style="color: #00ffff; text-decoration: underline;">
-                            <i class="fas fa-download"></i> products.json
-                        </a>
-                    </li>
-                    <li>Замените файл в корне сайта</li>
-                    <li>Через 1-2 минуты изменения появятся на сайте</li>
-                </ol>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(0,255,0,0.1); border: 1px solid #00ff00;">
-                    <p style="color: #00ff00; margin: 0;">
-                        <i class="fas fa-check"></i> <strong>Сейчас на сайте:</strong><br>
-                        Товаров: <strong>${data.categories.reduce((sum, cat) => sum + cat.products.length, 0)}</strong><br>
-                        Категорий: <strong>${data.categories.length}</strong>
-                    </p>
-                </div>
-            </div>
-        `;
-        
-        // 3. Синхронизируем с другими вкладками
-        syncWithOtherTabs();
-        
-        // 4. Очищаем URL через минуту
-        setTimeout(() => {
-            URL.revokeObjectURL(url);
-        }, 60000);
-        
-    } catch (error) {
-        const statusElement = document.getElementById('update-site-status');
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <div class="status error">
-                    <i class="fas fa-exclamation-circle"></i> Ошибка: ${error.message}
-                </div>
-            `;
-        }
-    }
 }
 
 // Обновление вкладки бэкапа
@@ -1848,6 +1923,21 @@ style.textContent = `
         border-color: #00ffff;
         transform: translateY(-3px);
         box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+    }
+    
+    .github-notification {
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 `;
 document.head.appendChild(style);
