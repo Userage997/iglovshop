@@ -195,9 +195,6 @@ function loadProducts() {
 function forceRefreshProducts() {
     console.log('[SITE] Принудительное обновление товаров');
     
-    // Очищаем localStorage
-    localStorage.removeItem('iglova_shop_products');
-    
     // Показываем загрузку
     const container = document.getElementById('products-container');
     if (container) {
@@ -205,7 +202,7 @@ function forceRefreshProducts() {
             <div class="loading-products">
                 <div class="loading-spinner"></div>
                 <p>ОБНОВЛЕНИЕ БАЗЫ ДАННЫХ...</p>
-                <p class="loading-subtext">Подключение к серверу...</p>
+                <p class="loading-subtext">Проверка обновлений...</p>
             </div>
         `;
     }
@@ -215,27 +212,81 @@ function forceRefreshProducts() {
     if (statusElement) {
         statusElement.innerHTML = `
             <div class="status-loading">
-                <i class="fas fa-sync fa-spin"></i> Загрузка актуальных данных...
+                <i class="fas fa-sync fa-spin"></i> Проверка данных...
             </div>
         `;
     }
     
-    // Загружаем заново
-    setTimeout(() => {
-        loadProducts();
-        showSiteNotification('🔄 База товаров обновлена', 'success');
-        
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <div class="status-success">
-                    <i class="fas fa-check-circle"></i> Данные обновлены
-                </div>
-            `;
-            setTimeout(() => {
-                statusElement.innerHTML = '';
-            }, 3000);
-        }
-    }, 1000);
+    // Пытаемся загрузить из localStorage (главный источник)
+    const localData = localStorage.getItem('iglova_shop_products');
+    if (localData) {
+        setTimeout(() => {
+            allProductsData = JSON.parse(localData);
+            console.log('[SITE] Загружено из localStorage');
+            displaySiteProducts(allProductsData);
+            updateLastUpdateTime();
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-success">
+                        <i class="fas fa-check-circle"></i> Используются локальные данные
+                    </div>
+                `;
+                setTimeout(() => {
+                    statusElement.innerHTML = '';
+                }, 3000);
+            }
+        }, 500);
+        return;
+    }
+    
+    // Если в localStorage нет, пробуем файл
+    fetch('products.json?v=' + Date.now())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Файл не найден');
+            }
+            return response.json();
+        })
+        .then(data => {
+            allProductsData = data;
+            console.log('[SITE] Загружено из файла');
+            displaySiteProducts(data);
+            
+            localStorage.setItem('iglova_shop_products', JSON.stringify(data));
+            updateLastUpdateTime();
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-success">
+                        <i class="fas fa-check-circle"></i> Данные загружены из файла
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('[SITE] Ошибка загрузки:', error);
+            
+            const container = document.getElementById('products-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Нет товаров</h3>
+                        <p>Используйте админ-панель для добавления товаров</p>
+                        <p class="loading-subtext">После добавления товаров нажмите "Обновить базу"</p>
+                    </div>
+                `;
+            }
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="status-error">
+                        <i class="fas fa-exclamation-triangle"></i> Нет данных
+                    </div>
+                `;
+            }
+        });
 }
 
 function updateLastUpdateTime() {
