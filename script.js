@@ -129,8 +129,8 @@ function openAdminPanel() {
     const password = prompt('🔐 Введите пароль администратора:');
     
     if (password === 'maybelaterfuck') {
-        // Открываем админ-панель в новой вкладке
-        window.open('/admin/admin.html', '_blank');
+        // ОТКРЫВАЕМ ПОЛНЫЙ ПУТЬ к админке
+        window.open('/iglovshop/admin/admin.html', '_blank');
     } else if (password !== null) {
         alert('❌ Неверный пароль!');
     }
